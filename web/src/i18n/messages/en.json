@@ -1,0 +1,45 @@
+{
+  "common": {
+    "continue": "Continue",
+    "back": "Back",
+    "loading": "Loading",
+    "retry": "Try again",
+    "offline": "You are offline"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "inviteCode": "Enter your invite code",
+    "invitePrompt": "Your employer sent you a code by SMS or email"
+  },
+  "onboarding": {
+    "language": "Which language do you prefer?",
+    "mode": "How would you like to learn?",
+    "modeSpeech": "By talking",
+    "modeText": "By reading",
+    "profession": "What is your trade?",
+    "skillLevel": "What are you training for?"
+  },
+  "worker": {
+    "plan": "My learning",
+    "lesson": "Lesson",
+    "assessment": "Check my skills",
+    "progress": "My progress",
+    "badges": "My badges",
+    "askAloud": "Hold to ask",
+    "tapPart": "Tap a part to ask about it"
+  },
+  "manager": {
+    "dashboard": "Team overview",
+    "workers": "Workers",
+    "content": "Learning content",
+    "knowledgeBase": "Knowledge base",
+    "reviewWarning": "Re-check this document before workers learn from it",
+    "rebuild": "Rebuild knowledge base"
+  },
+  "admin": {
+    "users": "Users",
+    "departments": "Departments",
+    "invites": "Invites",
+    "settings": "Organization settings"
+  }
+}
