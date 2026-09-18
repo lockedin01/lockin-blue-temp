@@ -80,20 +80,42 @@ class VisionProvider(Protocol):
 
 
 @runtime_checkable
-class ReconstructionProvider(Protocol):
-    """Photogrammetry backend.
+class SparseProvider(Protocol):
+    """Structure-from-motion: photographs in, camera poses out.
 
-    Split in two because the halves have different portability: `sparse` is CPU
-    work that runs anywhere, `mesh` needs either CUDA or a platform-specific
-    framework. A host can support the first and not the second, and the pipeline
-    has to be able to say so rather than fail opaquely at the end of a long job.
+    CPU work that runs on any platform, which is why it is separated from mesh
+    generation -- a host can support this and not that. It is also the only stage
+    that can answer whether the capture actually covers the machine, because it is
+    the one that knows which images failed to register.
     """
 
     name: str
 
     def sparse(self, images: list[Path], workspace: Path) -> SparseResult: ...
 
-    def mesh(self, sparse: SparseResult, workspace: Path) -> MeshResult: ...
+
+@runtime_checkable
+class MeshProvider(Protocol):
+    """Poses and photographs in, surface geometry out.
+
+    Takes the images as well as the sparse result because the two real backends
+    disagree about what they need: a COLMAP dense stage consumes the sparse
+    reconstruction, while Apple's PhotogrammetrySession runs its own SfM
+    internally and wants only the image directory. Passing both, and letting each
+    provider ignore what it does not use, is the honest shape -- the alternative
+    is a sparse result threaded into a provider that discards it.
+    """
+
+    name: str
+    #: Recorded on the artifact so a published twin always says how it was made.
+    source: str
+
+    def mesh(
+        self,
+        images: list[Path],
+        sparse: SparseResult | None,
+        workspace: Path,
+    ) -> MeshResult: ...
 
 
 @runtime_checkable

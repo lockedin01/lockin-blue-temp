@@ -18,11 +18,17 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import JSON, DateTime, Float, ForeignKey, Integer, String, Text, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 from machine_twin.config import settings
-from machine_twin.schema.models import AssetKind, JobState, ProjectStatus, Stage
+from machine_twin.schema.models import (
+    AssetKind,
+    JobState,
+    ProjectStatus,
+    Stage,
+    ValidationStatus,
+)
 
 
 def new_id() -> str:
@@ -102,6 +108,38 @@ class JobRow(Base):
     metrics: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
 
+class GeometryArtifactRow(Base):
+    """One piece of geometry and its provenance.
+
+    `source` and `validation_status` are not optional metadata. A published twin
+    must always be able to say how each piece of its geometry came to exist and
+    who confirmed it, and geometry that enters the system without those fields set
+    is geometry that can later be mistaken for engineering truth.
+    """
+
+    __tablename__ = "geometry_artifact"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("machine_project.id", ondelete="CASCADE"), index=True
+    )
+    org_id: Mapped[str] = mapped_column(String(64), index=True)
+    component_id: Mapped[str | None] = mapped_column(String(32), default=None, index=True)
+    path: Mapped[str] = mapped_column(String(1024))
+    format: Mapped[str] = mapped_column(String(16))
+    source: Mapped[str] = mapped_column(String(32))
+    lod: Mapped[int] = mapped_column(Integer, default=0)
+    vertex_count: Mapped[int] = mapped_column(Integer, default=0)
+    face_count: Mapped[int] = mapped_column(Integer, default=0)
+    confidence: Mapped[float | None] = mapped_column(Float, default=None)
+    confidence_method: Mapped[str] = mapped_column(String(64), default="heuristic")
+    validation_status: Mapped[str] = mapped_column(
+        String(24), default=ValidationStatus.GENERATED.value
+    )
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 _engine = None
 _SessionFactory: sessionmaker[Session] | None = None
 
@@ -151,10 +189,12 @@ __all__ = [
     "AssetKind",
     "AssetRow",
     "Base",
+    "GeometryArtifactRow",
     "JobRow",
     "JobState",
     "MachineProjectRow",
     "ProjectStatus",
+    "ValidationStatus",
     "Stage",
     "init_db",
     "new_id",

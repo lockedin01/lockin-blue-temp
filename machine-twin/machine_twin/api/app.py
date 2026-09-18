@@ -22,15 +22,29 @@ from sqlalchemy.orm import Session
 
 from machine_twin.capabilities import probe_all, select_mesh_provider
 from machine_twin.config import Settings, settings
-from machine_twin.db import AssetRow, MachineProjectRow, init_db, new_id, session_scope, utcnow
+from machine_twin.db import (
+    AssetRow,
+    GeometryArtifactRow,
+    JobRow,
+    MachineProjectRow,
+    init_db,
+    new_id,
+    session_scope,
+    utcnow,
+)
 from machine_twin.pipeline.ingest.metadata import UnsupportedAsset
 from machine_twin.pipeline.ingest.service import IngestService, to_model
+from machine_twin.pipeline.jobs import StageFailure
+from machine_twin.pipeline.reconstruct.service import ReconstructionService, _to_geometry
 from machine_twin.schema.models import (
     Asset,
+    CoverageReport,
+    GeometryArtifact,
     IngestResult,
     MachineProject,
     MachineProjectCreate,
     ProjectStatus,
+    ReconstructionOutcome,
     Stage,
     StageError,
 )
@@ -245,3 +259,121 @@ def asset_thumbnail(asset_id: str, org_id: OrgId) -> FileResponse:
         if not row.thumbnail_path or not Path(row.thumbnail_path).is_file():
             raise HTTPException(status.HTTP_404_NOT_FOUND, "no thumbnail for this asset")
         return FileResponse(row.thumbnail_path, media_type="image/webp")
+
+
+# ---------------------------------------------------------------------------
+# pipeline stages
+# ---------------------------------------------------------------------------
+
+#: Stages runnable through the API. Independently rerunnable (§29), so each is
+#: addressed by name rather than hidden behind a single "process" call.
+_STAGE_RUNNERS = {Stage.RECONSTRUCT.value}
+
+
+@app.post("/projects/{project_id}/stages/{stage}", response_model=ReconstructionOutcome)
+def run_stage_endpoint(
+    project_id: str,
+    stage: str,
+    org_id: OrgId,
+    force: bool = False,
+) -> ReconstructionOutcome:
+    """Run one pipeline stage.
+
+    `force=true` bypasses the input-hash cache. Without it a stage whose inputs
+    are unchanged returns its previous result as SKIPPED rather than recomputing.
+
+    A stage that fails returns 422 carrying the structured StageError, so the
+    caller can distinguish "add more photographs" from "install COLMAP" -- the
+    whole point of §28.
+    """
+    if stage not in _STAGE_RUNNERS:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            f"unknown or not-yet-implemented stage {stage!r}. Available: {sorted(_STAGE_RUNNERS)}",
+        )
+
+    outcome: ReconstructionOutcome | None = None
+    error: StageError | None = None
+
+    # The failure is captured, not raised through the session context. Letting it
+    # propagate would roll the transaction back and discard the job row that
+    # records why the stage failed -- leaving a failed stage looking like one that
+    # never ran.
+    with _session() as session:
+        project = _project_or_404(session, project_id, org_id)
+        try:
+            outcome = ReconstructionService().run(session, project, force=force)
+        except StageFailure as failure:
+            error = failure.error
+
+    if error is not None:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=error.model_dump(mode="json"),
+        )
+    assert outcome is not None  # noqa: S101 - one of the two branches always runs
+    return outcome
+
+
+@app.get("/projects/{project_id}/coverage", response_model=CoverageReport | None)
+def project_coverage(project_id: str, org_id: OrgId) -> CoverageReport | None:
+    """Capture coverage from the most recent reconstruction attempt.
+
+    Read from the job's recorded metrics rather than recomputed: coverage is a
+    property of a particular run against a particular image set, and recomputing
+    it on read would answer a different question.
+    """
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        job = session.execute(
+            select(JobRow)
+            .where(JobRow.project_id == project_id, JobRow.stage == Stage.RECONSTRUCT.value)
+            .order_by(JobRow.started_at.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        if job is None or not (job.metrics or {}).get("coverage"):
+            return None
+        return CoverageReport(**job.metrics["coverage"])
+
+
+@app.get("/projects/{project_id}/jobs")
+def project_jobs(project_id: str, org_id: OrgId) -> list[dict[str, Any]]:
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        rows = (
+            session.execute(
+                select(JobRow)
+                .where(JobRow.project_id == project_id)
+                .order_by(JobRow.started_at.desc())
+            )
+            .scalars()
+            .all()
+        )
+        return [
+            {
+                "id": row.id,
+                "stage": row.stage,
+                "state": row.state,
+                "started_at": row.started_at,
+                "ended_at": row.ended_at,
+                "error": row.error,
+                "metrics": row.metrics,
+            }
+            for row in rows
+        ]
+
+
+@app.get("/projects/{project_id}/geometry", response_model=list[GeometryArtifact])
+def project_geometry(project_id: str, org_id: OrgId) -> list[GeometryArtifact]:
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        rows = (
+            session.execute(
+                select(GeometryArtifactRow)
+                .where(GeometryArtifactRow.project_id == project_id)
+                .order_by(GeometryArtifactRow.created_at.desc())
+            )
+            .scalars()
+            .all()
+        )
+        return [_to_geometry(row) for row in rows]

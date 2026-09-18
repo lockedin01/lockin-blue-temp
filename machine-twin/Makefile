@@ -9,6 +9,7 @@ help:
 	@echo "build-object-capture  compile the macOS mesh helper"
 	@echo "dev        run the API with reload"
 	@echo "test       run the test suite"
+	@echo "test-slow  run integration tests (needs colmap + blender)"
 	@echo "lint       ruff"
 	@echo "typecheck  mypy"
 	@echo "check      lint + typecheck + test"
@@ -34,6 +35,10 @@ dev:
 
 test:
 	$(UV) run pytest -q
+
+# Renders the fixture and runs a real COLMAP solve. Needs blender and colmap.
+test-slow:
+	$(UV) run pytest -q -m slow
 
 lint:
 	$(UV) run ruff check machine_twin tests

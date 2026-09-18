@@ -254,11 +254,19 @@ def probe_colmap() -> Capability:
         )
 
     match = _COLMAP_VERSION_RE.search(out)
+    # COLMAP states its own build configuration in the banner, e.g.
+    # "COLMAP 4.2.0 (Commit Unknown on Unknown without GPU support)". That is the
+    # authoritative answer about the dense stage and is cheaper and more reliable
+    # than inferring it from the platform.
+    gpu_less = bool(re.search(r"without\s+GPU\s+support", out, re.IGNORECASE))
+    detail = f"sparse SfM available at {exe}"
+    if gpu_less:
+        detail += " (built without GPU support: dense stage unavailable)"
     return Capability(
         "colmap",
         Status.AVAILABLE,
         version=match.group(1) if match else None,
-        detail=f"sparse SfM available at {exe}",
+        detail=detail,
     )
 
 
@@ -276,6 +284,16 @@ def probe_colmap_dense(colmap: Capability, cuda: Capability) -> Capability:
             Status.ABSENT,
             detail="COLMAP is not installed.",
             remediation=colmap.remediation,
+        )
+    if "without GPU support" in colmap.detail:
+        # COLMAP said so itself. No need to guess, and no need to run it.
+        return Capability(
+            "colmap_dense",
+            Status.DEGRADED,
+            version=colmap.version,
+            detail="COLMAP reports it was built without GPU support; patch_match_stereo "
+            "cannot run.",
+            remediation="Use a non-COLMAP mesh provider, or install a CUDA-enabled COLMAP.",
         )
     if cuda.status is not Status.AVAILABLE:
         return Capability(
@@ -525,3 +543,19 @@ def select_mesh_provider(report: CapabilityReport) -> str | None:
         if cap is not None and cap.ok:
             return provider
     return None
+
+
+_CACHED: CapabilityReport | None = None
+
+
+def get_report(*, refresh: bool = False) -> CapabilityReport:
+    """The capability report, probed once per process.
+
+    Probing shells out to half a dozen binaries; doing that per request would put
+    several hundred milliseconds on every call. `refresh` exists because a user who
+    has just run `brew install colmap` should not have to restart the service.
+    """
+    global _CACHED
+    if _CACHED is None or refresh:
+        _CACHED = probe_all()
+    return _CACHED

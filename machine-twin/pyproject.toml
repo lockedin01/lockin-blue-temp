@@ -80,3 +80,10 @@ disallow_untyped_calls = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+# Integration tests that render and solve take about a minute and need the full
+# toolchain. Deselected by default so `make check` stays usable; `make test-slow`
+# runs them.
+addopts = '-m "not slow"'
+markers = [
+    "slow: requires COLMAP and/or Blender and takes tens of seconds",
+]

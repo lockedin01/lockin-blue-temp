@@ -12,8 +12,9 @@ from machine_twin.providers.base import (
     DocumentProvider,
     GeometryProcessor,
     LLMProvider,
+    MeshProvider,
     MeshResult,
-    ReconstructionProvider,
+    SparseProvider,
     SparseResult,
     VisionProvider,
 )
@@ -22,8 +23,9 @@ __all__ = [
     "DocumentProvider",
     "GeometryProcessor",
     "LLMProvider",
+    "MeshProvider",
     "MeshResult",
-    "ReconstructionProvider",
+    "SparseProvider",
     "SparseResult",
     "VisionProvider",
 ]

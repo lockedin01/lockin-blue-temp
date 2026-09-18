@@ -143,3 +143,46 @@ class StageError(BaseModel):
     message: str
     recoverable: bool = True
     remediation: str = ""
+
+
+class CoverageReport(BaseModel):
+    """Whether the capture actually covers the machine.
+
+    Surfaced on its own endpoint as well as inside the reconstruction outcome,
+    because §8 requires the system to say the capture is insufficient rather than
+    silently producing a bad model from it.
+    """
+
+    status: str
+    fraction: float
+    registered: int
+    total: int
+    recommendation: str
+    method: str
+
+
+class GeometryArtifact(BaseModel):
+    id: str
+    project_id: str
+    path: str
+    format: str
+    source: GeometrySource
+    lod: int = 0
+    vertex_count: int = 0
+    face_count: int = 0
+    confidence: float | None = None
+    confidence_method: str
+    validation_status: ValidationStatus
+    meta: dict[str, Any] = Field(default_factory=dict)
+
+
+class ReconstructionOutcome(BaseModel):
+    job_id: str
+    state: JobState
+    image_count: int
+    coverage: CoverageReport | None = None
+    sparse_provider: str | None = None
+    mesh_provider: str | None = None
+    geometry: GeometryArtifact | None = None
+    error: StageError | None = None
+    duration_s: float | None = None
