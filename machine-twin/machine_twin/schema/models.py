@@ -209,3 +209,21 @@ class AuthoringOutcome(BaseModel):
     poster_path: str | None = None
     error: StageError | None = None
     duration_s: float | None = None
+
+
+class ComponentUpdate(BaseModel):
+    label: str | None = Field(default=None, min_length=1, max_length=200)
+    category: str | None = Field(default=None, max_length=64)
+    validation_status: ValidationStatus | None = None
+    confidence: float | None = Field(default=None, ge=0.0, le=1.0)
+    meta: dict[str, Any] | None = None
+
+
+class SemanticOutcome(BaseModel):
+    job_id: str
+    state: JobState
+    machine_type: str | None = None
+    components_classified: int = 0
+    components: list[Component] = Field(default_factory=list)
+    error: StageError | None = None
+    duration_s: float | None = None

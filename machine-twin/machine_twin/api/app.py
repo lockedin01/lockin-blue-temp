@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -37,10 +38,12 @@ from machine_twin.pipeline.ingest.metadata import UnsupportedAsset
 from machine_twin.pipeline.ingest.service import IngestService, to_model
 from machine_twin.pipeline.jobs import StageFailure
 from machine_twin.pipeline.reconstruct.service import ReconstructionService, _to_geometry
+from machine_twin.pipeline.semantic.service import SemanticService
 from machine_twin.schema.models import (
     Asset,
     AuthoringOutcome,
     Component,
+    ComponentUpdate,
     CoverageReport,
     GeometryArtifact,
     IngestResult,
@@ -48,6 +51,7 @@ from machine_twin.schema.models import (
     MachineProjectCreate,
     ProjectStatus,
     ReconstructionOutcome,
+    SemanticOutcome,
     Stage,
     StageError,
 )
@@ -65,6 +69,14 @@ app = FastAPI(
     version="0.1.0",
     summary="Industrial machine reconstruction pipeline",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -270,19 +282,19 @@ def asset_thumbnail(asset_id: str, org_id: OrgId) -> FileResponse:
 
 #: Stages runnable through the API. Independently rerunnable (§29), so each is
 #: addressed by name rather than hidden behind a single "process" call.
-_STAGE_RUNNERS = {Stage.RECONSTRUCT.value, Stage.AUTHOR.value}
+_STAGE_RUNNERS = {Stage.RECONSTRUCT.value, Stage.AUTHOR.value, Stage.SEMANTICIZE.value}
 
 
 @app.post(
     "/projects/{project_id}/stages/{stage}",
-    response_model=ReconstructionOutcome | AuthoringOutcome,
+    response_model=ReconstructionOutcome | AuthoringOutcome | SemanticOutcome,
 )
 def run_stage_endpoint(
     project_id: str,
     stage: str,
     org_id: OrgId,
     force: bool = False,
-) -> ReconstructionOutcome | AuthoringOutcome:
+) -> ReconstructionOutcome | AuthoringOutcome | SemanticOutcome:
     """Run one pipeline stage.
 
     `force=true` bypasses the input-hash cache. Without it a stage whose inputs
@@ -298,7 +310,7 @@ def run_stage_endpoint(
             f"unknown or not-yet-implemented stage {stage!r}. Available: {sorted(_STAGE_RUNNERS)}",
         )
 
-    outcome: ReconstructionOutcome | AuthoringOutcome | None = None
+    outcome: ReconstructionOutcome | AuthoringOutcome | SemanticOutcome | None = None
     error: StageError | None = None
 
     # The failure is captured, not raised through the session context. Letting it
@@ -307,7 +319,13 @@ def run_stage_endpoint(
     # never ran.
     with _session() as session:
         project = _project_or_404(session, project_id, org_id)
-        runner = ReconstructionService() if stage == Stage.RECONSTRUCT.value else AuthoringService()
+        runner: ReconstructionService | AuthoringService | SemanticService
+        if stage == Stage.RECONSTRUCT.value:
+            runner = ReconstructionService()
+        elif stage == Stage.AUTHOR.value:
+            runner = AuthoringService()
+        else:
+            runner = SemanticService()
         try:
             outcome = runner.run(session, project, force=force)
         except StageFailure as failure:
@@ -396,6 +414,26 @@ def project_components(project_id: str, org_id: OrgId) -> list[Component]:
     with _session() as session:
         _project_or_404(session, project_id, org_id)
         return AuthoringService().components(session, project_id)
+
+
+@app.patch("/projects/{project_id}/components/{component_id}", response_model=Component)
+def update_component(
+    project_id: str,
+    component_id: str,
+    payload: ComponentUpdate,
+    org_id: OrgId,
+) -> Component:
+    """Operator review API: validate, rename or update component metadata."""
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        try:
+            return SemanticService().update_component(
+                session, project_id, component_id, org_id, payload
+            )
+        except KeyError:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND, f"no component {component_id} in project {project_id}"
+            ) from None
 
 
 @app.get("/projects/{project_id}/model")
