@@ -68,6 +68,15 @@ python_version = "3.12"
 strict = true
 warn_unreachable = true
 
+# pymupdf ships incomplete type information, so calls into it read as untyped.
+# Scoped to the two modules that touch it rather than relaxing the project.
+[[tool.mypy.overrides]]
+module = [
+    "machine_twin.pipeline.ingest.metadata",
+    "machine_twin.pipeline.ingest.thumbnails",
+]
+disallow_untyped_calls = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
