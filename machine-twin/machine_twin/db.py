@@ -108,6 +108,36 @@ class JobRow(Base):
     metrics: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
 
+class ComponentRow(Base):
+    """One identified part of a machine.
+
+    `stable_id` is the identity SkillBridge consumes: it becomes `AssetHotspot.id`
+    in the published package, so tapping a part in the viewer resolves here. It is
+    minted once at first detection and never regenerated -- renaming a component
+    in review changes its `label`, never its id, because a changed id silently
+    breaks every hotspot, document link and assessment that referenced it.
+    """
+
+    __tablename__ = "component"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    project_id: Mapped[str] = mapped_column(
+        String(32), ForeignKey("machine_project.id", ondelete="CASCADE"), index=True
+    )
+    org_id: Mapped[str] = mapped_column(String(64), index=True)
+    stable_id: Mapped[str] = mapped_column(String(64), index=True)
+    label: Mapped[str] = mapped_column(String(200), default="unknown_component")
+    category: Mapped[str] = mapped_column(String(64), default="unknown")
+    parent_id: Mapped[str | None] = mapped_column(String(32), default=None)
+    confidence: Mapped[float | None] = mapped_column(Float, default=None)
+    confidence_method: Mapped[str] = mapped_column(String(64), default="not_estimated")
+    validation_status: Mapped[str] = mapped_column(
+        String(24), default=ValidationStatus.GENERATED.value
+    )
+    meta: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 class GeometryArtifactRow(Base):
     """One piece of geometry and its provenance.
 
@@ -189,6 +219,7 @@ __all__ = [
     "AssetKind",
     "AssetRow",
     "Base",
+    "ComponentRow",
     "GeometryArtifactRow",
     "JobRow",
     "JobState",

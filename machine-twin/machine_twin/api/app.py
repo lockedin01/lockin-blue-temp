@@ -32,12 +32,15 @@ from machine_twin.db import (
     session_scope,
     utcnow,
 )
+from machine_twin.pipeline.authoring.service import AuthoringService
 from machine_twin.pipeline.ingest.metadata import UnsupportedAsset
 from machine_twin.pipeline.ingest.service import IngestService, to_model
 from machine_twin.pipeline.jobs import StageFailure
 from machine_twin.pipeline.reconstruct.service import ReconstructionService, _to_geometry
 from machine_twin.schema.models import (
     Asset,
+    AuthoringOutcome,
+    Component,
     CoverageReport,
     GeometryArtifact,
     IngestResult,
@@ -267,16 +270,19 @@ def asset_thumbnail(asset_id: str, org_id: OrgId) -> FileResponse:
 
 #: Stages runnable through the API. Independently rerunnable (§29), so each is
 #: addressed by name rather than hidden behind a single "process" call.
-_STAGE_RUNNERS = {Stage.RECONSTRUCT.value}
+_STAGE_RUNNERS = {Stage.RECONSTRUCT.value, Stage.AUTHOR.value}
 
 
-@app.post("/projects/{project_id}/stages/{stage}", response_model=ReconstructionOutcome)
+@app.post(
+    "/projects/{project_id}/stages/{stage}",
+    response_model=ReconstructionOutcome | AuthoringOutcome,
+)
 def run_stage_endpoint(
     project_id: str,
     stage: str,
     org_id: OrgId,
     force: bool = False,
-) -> ReconstructionOutcome:
+) -> ReconstructionOutcome | AuthoringOutcome:
     """Run one pipeline stage.
 
     `force=true` bypasses the input-hash cache. Without it a stage whose inputs
@@ -292,7 +298,7 @@ def run_stage_endpoint(
             f"unknown or not-yet-implemented stage {stage!r}. Available: {sorted(_STAGE_RUNNERS)}",
         )
 
-    outcome: ReconstructionOutcome | None = None
+    outcome: ReconstructionOutcome | AuthoringOutcome | None = None
     error: StageError | None = None
 
     # The failure is captured, not raised through the session context. Letting it
@@ -301,8 +307,9 @@ def run_stage_endpoint(
     # never ran.
     with _session() as session:
         project = _project_or_404(session, project_id, org_id)
+        runner = ReconstructionService() if stage == Stage.RECONSTRUCT.value else AuthoringService()
         try:
-            outcome = ReconstructionService().run(session, project, force=force)
+            outcome = runner.run(session, project, force=force)
         except StageFailure as failure:
             error = failure.error
 
@@ -377,3 +384,59 @@ def project_geometry(project_id: str, org_id: OrgId) -> list[GeometryArtifact]:
             .all()
         )
         return [_to_geometry(row) for row in rows]
+
+
+@app.get("/projects/{project_id}/components", response_model=list[Component])
+def project_components(project_id: str, org_id: OrgId) -> list[Component]:
+    """Components and their stable ids.
+
+    These ids are what a published twin hands to SkillBridge as AssetHotspot.id,
+    so this endpoint is the contract between the two systems.
+    """
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        return AuthoringService().components(session, project_id)
+
+
+@app.get("/projects/{project_id}/model")
+def project_model(project_id: str, org_id: OrgId, lod: int = 0) -> FileResponse:
+    """Serve one level of detail as GLB."""
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        artifacts = AuthoringService().glb_artifacts(session, project_id)
+        match = next((a for a in artifacts if a.lod == lod), None)
+        if match is None:
+            raise HTTPException(
+                status.HTTP_404_NOT_FOUND,
+                f"no GLB at lod {lod}. Run the author stage."
+                if not artifacts
+                else f"no GLB at lod {lod}; available: {sorted(a.lod for a in artifacts)}",
+            )
+        if not Path(match.path).is_file():
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "the GLB is missing from disk")
+        return FileResponse(match.path, media_type="model/gltf-binary")
+
+
+@app.get("/projects/{project_id}/poster")
+def project_poster(project_id: str, org_id: OrgId) -> FileResponse:
+    """The 2D fallback still.
+
+    Not optional in SkillBridge: it is what the viewer shows when the device or
+    network cannot carry live 3D, and tap-a-part must keep working against it.
+    """
+    with _session() as session:
+        _project_or_404(session, project_id, org_id)
+        job = session.execute(
+            select(JobRow)
+            .where(
+                JobRow.project_id == project_id,
+                JobRow.stage == Stage.AUTHOR.value,
+                JobRow.state == "succeeded",
+            )
+            .order_by(JobRow.started_at.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        poster = (job.metrics or {}).get("poster_path") if job else None
+        if not poster or not Path(poster).is_file():
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "no poster; run the author stage")
+        return FileResponse(poster, media_type="image/webp")

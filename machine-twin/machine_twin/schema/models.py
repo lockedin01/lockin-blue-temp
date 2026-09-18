@@ -186,3 +186,26 @@ class ReconstructionOutcome(BaseModel):
     geometry: GeometryArtifact | None = None
     error: StageError | None = None
     duration_s: float | None = None
+
+
+class Component(BaseModel):
+    id: str
+    project_id: str
+    stable_id: str
+    label: str
+    category: str
+    confidence: float | None = None
+    confidence_method: str
+    validation_status: ValidationStatus
+    meta: dict[str, Any] = Field(default_factory=dict)
+
+
+class AuthoringOutcome(BaseModel):
+    job_id: str
+    state: JobState
+    machine_id: str | None = None
+    components: list[Component] = Field(default_factory=list)
+    lods: list[GeometryArtifact] = Field(default_factory=list)
+    poster_path: str | None = None
+    error: StageError | None = None
+    duration_s: float | None = None
