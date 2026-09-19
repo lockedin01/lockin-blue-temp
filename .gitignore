@@ -1,0 +1,13 @@
+.DS_Store
+.vscode/
+.idea/
+*.log
+.env
+.env.local
+*.md
+
+# third-party module kept locally for reference only — not our code, not shipped
+reference/
+# Python bytecode (tools/)
+__pycache__/
+*.pyc
