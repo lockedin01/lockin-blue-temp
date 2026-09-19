@@ -333,26 +333,23 @@ export async function GET(
             var rotateEls = document.querySelectorAll('#rotatingGroup, #spinner, [id*="Spinner"], [id*="spinner"], [id*="rotor"], [id*="Rotor"], [id*="Pump_0"], [id*="Pump2_0"], [id*="motor_0"], [id*="rotating"]');
             rotateEls.forEach(function(el) {
               if (el.closest("defs")) return;
-              var bbox;
-              try { bbox = el.getBBox(); } catch(e) { bbox = { x: 0, y: 0, width: 60, height: 60 }; }
-              var cx = (bbox.x + bbox.width / 2) || 0;
-              var cy = (bbox.y + bbox.height / 2) || 0;
               var initialTf = el.getAttribute("transform") || "";
               
               var mTx = 0, mTy = 0;
+              var a = 1, b = 0, c = 0, d = 1;
               if (initialTf.indexOf("matrix(") !== -1) {
                 var innerTf = initialTf.substring(initialTf.indexOf("matrix(") + 7, initialTf.indexOf(")"));
                 var tfVals = innerTf.replace(/,/g, " ").trim().split(" ").filter(Boolean).map(Number);
-                mTx = tfVals[4] || 0;
-                mTy = tfVals[5] || 0;
+                if (tfVals.length === 6) {
+                  a = tfVals[0]; b = tfVals[1]; c = tfVals[2]; d = tfVals[3];
+                  mTx = tfVals[4]; mTy = tfVals[5];
+                }
               }
 
               var isRotor = el.id === "rotatingGroup" || el.id.toLowerCase().indexOf("rotor") !== -1;
               rotatingNodes.push({
                 el: el,
-                initialTf: initialTf,
-                cx: cx,
-                cy: cy,
+                a: a, b: b, c: c, d: d,
                 mTx: mTx,
                 mTy: mTy,
                 isRotor: isRotor,
@@ -450,11 +447,14 @@ export async function GET(
             for (var j = 0; j < rotatingNodes.length; j++) {
               var rNode = rotatingNodes[j];
               var deg = (accumulatedAngle * rNode.speed) % 360;
-              if (rNode.isRotor) {
-                rNode.el.setAttribute("transform", rNode.initialTf + " rotate(" + deg.toFixed(1) + ")");
-              } else {
-                rNode.el.setAttribute("transform", rNode.initialTf + " rotate(" + deg.toFixed(1) + ")");
-              }
+              var rad = (deg * Math.PI) / 180;
+              var cos = Math.cos(rad);
+              var sin = Math.sin(rad);
+              var nA = rNode.a * cos - rNode.b * sin;
+              var nB = rNode.a * sin + rNode.b * cos;
+              var nC = rNode.c * cos - rNode.d * sin;
+              var nD = rNode.c * sin + rNode.d * cos;
+              rNode.el.setAttribute("transform", "matrix(" + nA.toFixed(4) + " " + nB.toFixed(4) + " " + nC.toFixed(4) + " " + nD.toFixed(4) + " " + rNode.mTx.toFixed(2) + " " + rNode.mTy.toFixed(2) + ")");
             }
 
             // Animate Cylinders extending against mechanical springs
