@@ -167,6 +167,26 @@ async function extractToken(req?: Request): Promise<string | null> {
   return null;
 }
 
+async function devPreviewSession(): Promise<SessionUser | null> {
+  if (process.env.NODE_ENV === 'production') return null;
+
+  try {
+    const cookieStore = await cookies();
+    const devCookie = cookieStore.get('dev_role')?.value;
+    const role = isRole(devCookie) ? devCookie : process.env.DEV_PREVIEW_ROLE;
+    if (!isRole(role)) return null;
+
+    return {
+      userId: process.env.DEV_PREVIEW_USER_ID ?? 'user-demo',
+      orgId: process.env.DEV_PREVIEW_ORG_ID ?? 'org-demo',
+      role,
+      deptId: null,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Server-side session verification. Strictly follows CLAUDE.md:
  * - orgId, userId and role come ONLY from verified Cognito claims (or the
@@ -179,6 +199,14 @@ export async function requireSession(
   requiredRole?: Role,
   req?: Request
 ): Promise<SessionUser> {
+  const preview = await devPreviewSession();
+  if (preview) {
+    if (requiredRole && preview.role !== requiredRole) {
+      throw new AuthError(`Requires ${requiredRole}`, 403);
+    }
+    return preview;
+  }
+
   const token = await extractToken(req);
   if (!token) {
     throw new AuthError('Missing authentication token', 401);

@@ -33,378 +33,44 @@ export interface LessonContent {
   simulationConfig: SimulationConfig;
 }
 
+import categorizedCurriculumData from './categorized-curriculum.json';
+
 export interface CurriculumModule {
   id: string;
   lessonId: string;
   title: string;
   meta: string;
   status: 'completed' | 'in-progress' | 'pending';
+  thumbnail_url?: string;
+  description?: string;
+  pressures?: Array<{ value: number; unit: string; confidence: string }>;
+  component_count?: number;
+  slug?: string;
 }
 
 export interface CurriculumStage {
   seq: number;
   title: string;
   description: string;
+  simulations_count?: number;
   items: CurriculumModule[];
 }
 
 export interface TradeTrack {
   id: string;
   name: string;
+  title?: string;
   digitalTwin: string;
   industry: string;
   description: string;
+  total_simulations?: number;
+  total_sessions?: number;
+  accent?: string;
+  icon?: string;
   stages: CurriculumStage[];
 }
 
-export const TRADES_CATALOG: Record<string, TradeTrack> = {
-  hydraulics: {
-    id: 'hydraulics',
-    name: 'Hydraulics Maintenance Technician',
-    digitalTwin: 'HPU-400 Industrial Hydraulic Unit',
-    industry: 'Heavy Manufacturing, Steel Plants, Mobile Machinery',
-    description: 'Master power unit startup, pressure relief valve calibration, spool sequencing, and leak diagnostics.',
-    stages: [
-      {
-        seq: 1,
-        title: 'Foundations & Plant Safety',
-        description: 'Build core SOP knowledge, fluid safety protocols, and machine pre-checks.',
-        items: [
-          {
-            id: 'h-1-1',
-            lessonId: 'lesson-hpu-overview',
-            title: 'How the hydraulic power unit works',
-            meta: 'Completed',
-            status: 'completed',
-          },
-          {
-            id: 'h-1-2',
-            lessonId: 'lesson-hpu-startup',
-            title: 'Safe start-up procedure',
-            meta: 'Resume ~15 mins',
-            status: 'in-progress',
-          },
-          {
-            id: 'h-1-3',
-            lessonId: 'lesson-relief-valve',
-            title: 'Pressure relief valve calibration & cracking pressure',
-            meta: '15 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-1-4',
-            lessonId: 'lesson-directional-valve',
-            title: 'Directional control valve spool operation',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 2,
-        title: 'Shop-Floor Operations',
-        description: 'Master active line operation, reservoir maintenance, and fluid filtration.',
-        items: [
-          {
-            id: 'h-2-1',
-            lessonId: 'lesson-hpu-overview',
-            title: 'Daily reservoir fluid level & temperature inspection',
-            meta: '10 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-2-2',
-            lessonId: 'lesson-hpu-startup',
-            title: 'Return line filter differential pressure check',
-            meta: '12 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-2-3',
-            lessonId: 'lesson-directional-valve',
-            title: 'Directional control valve manual override',
-            meta: '18 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-2-4',
-            lessonId: 'lesson-hpu-startup',
-            title: 'Hose assembly & crimp joint integrity testing',
-            meta: '15 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 3,
-        title: 'Diagnostics & Troubleshooting',
-        description: 'Go deeper into pressure drop isolation, seal bypass, and pump cavitation.',
-        items: [
-          {
-            id: 'h-3-1',
-            lessonId: 'lesson-pressure-loss',
-            title: 'Finding a pressure loss & pump cavitation',
-            meta: '20 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-3-2',
-            lessonId: 'lesson-relief-valve',
-            title: 'Cavitation & aeration acoustic detection',
-            meta: '15 mins',
-            status: 'pending',
-          },
-          {
-            id: 'h-3-3',
-            lessonId: 'lesson-directional-valve',
-            title: 'Cylinder piston bypass & internal leakage analysis',
-            meta: '25 mins',
-            status: 'pending',
-          },
-        ],
-      },
-    ],
-  },
-  electrical: {
-    id: 'electrical',
-    name: 'Industrial Electrical Technician',
-    digitalTwin: 'MCC-300 Motor Control Center',
-    industry: 'Automation Plants, Substations, Distribution Paneling',
-    description: 'Master 3-phase plant circuits, lockout/tagout (LOTO), diode bridges, and PLC bus troubleshooting.',
-    stages: [
-      {
-        seq: 1,
-        title: 'Electrical Safety & Circuit Protection',
-        description: 'Zero energy verification, arc flash prevention, and fuse/breaker sizing.',
-        items: [
-          {
-            id: 'e-1-1',
-            lessonId: 'lesson-electrical-safety',
-            title: 'Fuses & circuit breakers: thermal-magnetic trip curves',
-            meta: '15 mins',
-            status: 'in-progress',
-          },
-          {
-            id: 'e-1-2',
-            lessonId: 'lesson-electrical-safety',
-            title: 'Lockout/Tagout (LOTO) and zero-potential verification',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 2,
-        title: 'Power Electronics & Control Relays',
-        description: 'Solid-state switching, rectifier diode bridges, and contactor interlocking.',
-        items: [
-          {
-            id: 'e-2-1',
-            lessonId: 'lesson-electrical-safety',
-            title: 'Industrial diode bridge rectification & testing',
-            meta: '15 mins',
-            status: 'pending',
-          },
-          {
-            id: 'e-2-2',
-            lessonId: 'lesson-electrical-safety',
-            title: 'Motor starter contactors & thermal overload relays',
-            meta: '25 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 3,
-        title: 'Fieldbus & Diagnostics',
-        description: 'CAN bus communication, signal degradation, and insulation resistance testing.',
-        items: [
-          {
-            id: 'e-3-1',
-            lessonId: 'lesson-electrical-safety',
-            title: 'CAN Bus differential signal troubleshooting',
-            meta: '30 mins',
-            status: 'pending',
-          },
-          {
-            id: 'e-3-2',
-            lessonId: 'lesson-electrical-safety',
-            title: 'Megohmmeter insulation resistance (Megger) testing',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-    ],
-  },
-  mobile: {
-    id: 'mobile',
-    name: 'Mobile Equipment Technician',
-    digitalTwin: 'Cat 385C / PC210 Hydraulic Excavator',
-    industry: 'Mining, Earthmoving, Construction Equipment',
-    description: 'Operate hydrostatic travel drives, pilot controllers, cross-port relief braking, and air brake boosters.',
-    stages: [
-      {
-        seq: 1,
-        title: 'Mobile Braking & Air Systems',
-        description: 'Air brake governors, spring brake chambers, and pneumatic safety checks.',
-        items: [
-          {
-            id: 'm-1-1',
-            lessonId: 'lesson-mobile-brakes',
-            title: 'Air brake compressor & dual reservoir charging',
-            meta: '15 mins',
-            status: 'in-progress',
-          },
-          {
-            id: 'm-1-2',
-            lessonId: 'lesson-relief-valve',
-            title: 'Cross-port relief valve braking & anti-cavitation',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 2,
-        title: 'Hydrostatic Track Drives',
-        description: 'Closed-loop pump/motor hydrostatic transmission and flushing valves.',
-        items: [
-          {
-            id: 'm-2-1',
-            lessonId: 'lesson-hpu-overview',
-            title: 'Closed-loop swashplate servo angle control',
-            meta: '25 mins',
-            status: 'pending',
-          },
-          {
-            id: 'm-2-2',
-            lessonId: 'lesson-pressure-loss',
-            title: 'Charge pump pressure relief & hot oil shuttle valve',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 3,
-        title: 'Implement & Boom Hydraulics',
-        description: 'Load-sensing sectional valves, counterbalance valves, and cylinder holding.',
-        items: [
-          {
-            id: 'm-3-1',
-            lessonId: 'lesson-directional-valve',
-            title: 'Counterbalance valve load-holding & pilot ratio',
-            meta: '25 mins',
-            status: 'pending',
-          },
-        ],
-      },
-    ],
-  },
-  stationary: {
-    id: 'stationary',
-    name: 'Stationary Machinery Operator',
-    digitalTwin: 'Continuous Caster & Hydraulic Press Unit',
-    industry: 'Steel Mills, Foundries, Extrusion Lines',
-    description: 'Operate multi-cylinder daylight presses, continuous casters, and central hydraulic power units.',
-    stages: [
-      {
-        seq: 1,
-        title: 'Stationary Plant Safety & Interlocks',
-        description: 'Hydraulic accumulator dumps, safety gate interlocks, and emergency stop circuits.',
-        items: [
-          {
-            id: 's-1-1',
-            lessonId: 'lesson-hpu-startup',
-            title: 'Central hydraulic power unit pre-start verification',
-            meta: '15 mins',
-            status: 'in-progress',
-          },
-        ],
-      },
-      {
-        seq: 2,
-        title: 'Press & Caster Sequencing',
-        description: 'Multi-ram synchronizing valves, prefill valves, and decompression stages.',
-        items: [
-          {
-            id: 's-2-1',
-            lessonId: 'lesson-directional-valve',
-            title: 'High-speed prefill valve & decompression cycle',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 3,
-        title: 'Process Troubleshooting',
-        description: 'Proportional valve null shift, accumulator nitrogen charge, and contamination tracking.',
-        items: [
-          {
-            id: 's-3-1',
-            lessonId: 'lesson-pressure-loss',
-            title: 'Hydraulic accumulator bladder nitrogen precharge check',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-    ],
-  },
-  automation: {
-    id: 'automation',
-    name: 'Automation & PLC Specialist',
-    digitalTwin: 'Rockwell / Siemens S7-1500 Controller',
-    industry: 'Packaging, Robotics, Automated Assembly',
-    description: 'Program industrial ladder logic, diagnose 24VDC I/O cards, and integrate safety circuits.',
-    stages: [
-      {
-        seq: 1,
-        title: 'PLC Architecture & I/O Modules',
-        description: 'Sink/source digital wiring, analog scaling (4-20mA), and power supplies.',
-        items: [
-          {
-            id: 'a-1-1',
-            lessonId: 'lesson-plc-basics',
-            title: 'Programmable Logic Controller (PLC) hardware setup',
-            meta: '15 mins',
-            status: 'in-progress',
-          },
-        ],
-      },
-      {
-        seq: 2,
-        title: 'Ladder Logic & Sequencing',
-        description: 'Bit instructions, timers, counters, and state-machine sequencing.',
-        items: [
-          {
-            id: 'a-2-1',
-            lessonId: 'lesson-plc-basics',
-            title: 'Start/Stop seal-in logic & emergency interlocks',
-            meta: '20 mins',
-            status: 'pending',
-          },
-        ],
-      },
-      {
-        seq: 3,
-        title: 'Fault Isolation & Communications',
-        description: 'EtherNet/IP network packet loss, forced I/O audits, and safety PLC diagnostics.',
-        items: [
-          {
-            id: 'a-3-1',
-            lessonId: 'lesson-plc-basics',
-            title: 'Industrial network communication diagnostics',
-            meta: '25 mins',
-            status: 'pending',
-          },
-        ],
-      },
-    ],
-  },
-};
+export const TRADES_CATALOG: Record<string, TradeTrack> = categorizedCurriculumData as unknown as Record<string, TradeTrack>;
 
 export const LESSONS_DATABASE: Record<string, LessonContent> = {
   'lesson-hpu-overview': {
