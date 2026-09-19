@@ -1,20 +1,51 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
-import { InfraStack } from '../lib/infra-stack';
+import { REGION, stackName } from '../lib/config';
+import { SecurityStack } from '../lib/security-stack';
+import { DataStack } from '../lib/data-stack';
+import { AuthStack } from '../lib/auth-stack';
+import { AiStack } from '../lib/ai-stack';
+import { ComputeStack } from '../lib/compute-stack';
+import { WebStack } from '../lib/web-stack';
 
 const app = new cdk.App();
-new InfraStack(app, 'InfraStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
 
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+// Single region for everything (HANDOFF.md): no service needs ap-south-1, and
+// splitting would add cross-region auth/state complexity for no benefit.
+const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: REGION };
 
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+const security = new SecurityStack(app, stackName('security'), { env });
 
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+const data = new DataStack(app, stackName('data'), {
+  env,
+  dataKey: security.dataKey,
+});
+
+const auth = new AuthStack(app, stackName('auth'), { env });
+
+const ai = new AiStack(app, stackName('ai'), {
+  env,
+  table: data.table,
+  orgDocsBucket: data.orgDocsBucket,
+});
+
+new ComputeStack(app, stackName('compute'), {
+  env,
+  table: data.table,
+  userPoolId: auth.userPool.userPoolId,
+  userPoolClientId: auth.userPoolClient.userPoolClientId,
+  // The deployed web origin plus local development. The voice socket checks
+  // this in its upgrade handler, before any frame is read.
+  allowedOrigins: app.node.tryGetContext('allowedOrigins') ?? 'http://localhost:3000',
+});
+
+new WebStack(app, stackName('web'), {
+  env,
+  // Constructs, not ids: the SSR compute role is granted against both, and a
+  // name string cannot mutate a resource policy.
+  userPool: auth.userPool,
+  userPoolClientId: auth.userPoolClient.userPoolClientId,
+  table: data.table,
+  assessmentScorerQueue: ai.assessmentScorerQueue,
+  learningPlanQueue: ai.learningPlanQueue,
 });
