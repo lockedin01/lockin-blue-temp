@@ -330,9 +330,11 @@ export async function GET(
           }
 
           if (rotatingNodes.length === 0) {
-            var rotateEls = document.querySelectorAll('#rotatingGroup, #spinner, [id*="Spinner"], [id*="spinner"], [id*="rotor"], [id*="Rotor"], [id*="Pump_0"], [id*="Pump2_0"], [id*="motor_0"], [id*="rotating"]');
+            var rotateEls = document.querySelectorAll('#leftGear, #rightGear, [id*="leftGear"], [id*="rightGear"], #rotatingGroup, #spinner, [id*="Spinner"], [id*="spinner"], [id*="rotor"], [id*="Rotor"], [id*="Pump_0"], [id*="Pump2_0"], [id*="pump_0"], [id*="pump2_0"], [id*="motor_0"], [id*="Motor_0"], [id*="rotating"], [id*="impeller"], [id*="Impeller"], [id*="pinion"], [id*="Pinion"], [id*="sprocket"], [id*="Sprocket"]');
             rotateEls.forEach(function(el) {
               if (el.closest("defs")) return;
+              if (el.parentElement && el.parentElement.closest('#leftGear, #rightGear, [id*="leftGear"], [id*="rightGear"], #rotatingGroup, [id*="rotor"], [id*="Rotor"]')) return;
+              
               var initialTf = el.getAttribute("transform") || "";
               
               var mTx = 0, mTy = 0;
@@ -347,13 +349,16 @@ export async function GET(
               }
 
               var isRotor = el.id === "rotatingGroup" || el.id.toLowerCase().indexOf("rotor") !== -1;
+              var isOppositeGear = el.id === "rightGear" || el.id.toLowerCase().indexOf("rightgear") !== -1 || el.id.indexOf("gear2") !== -1;
+              var speed = isOppositeGear ? -120 : (isRotor ? 90 : 120);
+
               rotatingNodes.push({
                 el: el,
                 a: a, b: b, c: c, d: d,
                 mTx: mTx,
                 mTy: mTy,
                 isRotor: isRotor,
-                speed: isRotor ? 90 : 220
+                speed: speed
               });
             });
             window.__rotatingNodes = rotatingNodes;
@@ -414,8 +419,8 @@ export async function GET(
           _origRAF(runFluidEngine);
           window.__fluidFrames++;
 
-          // Ensure all elements are discovered even if dynamically rendered
-          if (arrowNodes.length === 0 || rotatingNodes.length === 0 || !cylinderPiston) {
+          // Scan elements on initial load or dynamic DOM changes
+          if (arrowNodes.length === 0 && rotatingNodes.length === 0 && !cylinderPiston) {
             scanElements();
           }
 
@@ -443,17 +448,17 @@ export async function GET(
               node.el.setAttribute("transform", "matrix(" + node.a + " " + node.b + " " + node.c + " " + node.d + " " + curTx.toFixed(2) + " " + curTy.toFixed(2) + ")");
             }
 
-            // Animate Rotating Pump / Motor Spinners and Vane Pump Rotors
+            // Animate Rotating Pump / Motor Spinners and Meshing Gears
             for (var j = 0; j < rotatingNodes.length; j++) {
               var rNode = rotatingNodes[j];
               var deg = (accumulatedAngle * rNode.speed) % 360;
               var rad = (deg * Math.PI) / 180;
               var cos = Math.cos(rad);
               var sin = Math.sin(rad);
-              var nA = rNode.a * cos - rNode.b * sin;
-              var nB = rNode.a * sin + rNode.b * cos;
-              var nC = rNode.c * cos - rNode.d * sin;
-              var nD = rNode.c * sin + rNode.d * cos;
+              var nA = rNode.a * cos + rNode.c * sin;
+              var nB = rNode.b * cos + rNode.d * sin;
+              var nC = -rNode.a * sin + rNode.c * cos;
+              var nD = -rNode.b * sin + rNode.d * cos;
               rNode.el.setAttribute("transform", "matrix(" + nA.toFixed(4) + " " + nB.toFixed(4) + " " + nC.toFixed(4) + " " + nD.toFixed(4) + " " + rNode.mTx.toFixed(2) + " " + rNode.mTy.toFixed(2) + ")");
             }
 
