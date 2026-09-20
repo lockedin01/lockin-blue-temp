@@ -1432,7 +1432,15 @@ export default function SimulationStudioPage() {
             </div>
 
             {/* Quick API Buttons */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 mb-6">
+            {/*
+              Flex-wrap, not a seven-column grid.
+              `md:grid-cols-7` forced seven equal columns onto labels that are
+              nowhere near equal — "GET /api/me" needs 47px and
+              "POST /api/assessments" needs 107px — so the long ones overflowed
+              their cells and the row ran off the right edge. Letting each button
+              size to its own label and wrap to the next line fits every width.
+            */}
+            <div className="flex flex-wrap gap-2 mb-6">
               <button
                 type="button"
                 onClick={() => {
@@ -1441,9 +1449,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/twin?action=capabilities', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-cyan-400">GET /capabilities</div>
+                <div className="font-bold break-words text-cyan-400">GET /capabilities</div>
                 <div className="text-[10px] text-slate-400 mt-1">Photogrammetry (:8000)</div>
               </button>
 
@@ -1455,9 +1463,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/twin?action=projects', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-cyan-400">GET /projects</div>
+                <div className="font-bold break-words text-cyan-400">GET /projects</div>
                 <div className="text-[10px] text-slate-400 mt-1">Scan Projects (:8000)</div>
               </button>
 
@@ -1469,9 +1477,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/me', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-blue-400">GET /api/me</div>
+                <div className="font-bold break-words text-blue-400">GET /api/me</div>
                 <div className="text-[10px] text-slate-400 mt-1">Profile (W1)</div>
               </button>
 
@@ -1483,9 +1491,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/plan', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-blue-400">GET /api/plan</div>
+                <div className="font-bold break-words text-blue-400">GET /api/plan</div>
                 <div className="text-[10px] text-slate-400 mt-1">Learning Plan (W2)</div>
               </button>
 
@@ -1497,9 +1505,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/lessons', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-blue-400">GET /api/lessons</div>
+                <div className="font-bold break-words text-blue-400">GET /api/lessons</div>
                 <div className="text-[10px] text-slate-400 mt-1">3D Assets (W3)</div>
               </button>
 
@@ -1520,9 +1528,9 @@ export default function SimulationStudioPage() {
                   setApiPayload(p);
                   runApiCall('/api/assessments', 'POST', p);
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-emerald-400">POST /api/assessments</div>
+                <div className="font-bold break-words text-emerald-400">POST /api/assessments</div>
                 <div className="text-[10px] text-slate-400 mt-1">Submit Attempt (W4)</div>
               </button>
 
@@ -1534,9 +1542,9 @@ export default function SimulationStudioPage() {
                   setApiPayload('{}');
                   runApiCall('/api/aggregates', 'GET');
                 }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
               >
-                <div className="font-bold text-blue-400">GET /api/aggregates</div>
+                <div className="font-bold break-words text-blue-400">GET /api/aggregates</div>
                 <div className="text-[10px] text-slate-400 mt-1">GetItem (M2/M3)</div>
               </button>
             </div>
