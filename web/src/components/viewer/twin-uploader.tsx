@@ -244,7 +244,25 @@ export function TwinUploader() {
           machine_type: cad ? 'cad_assembly' : 'photogrammetry_capture',
         }),
       });
-      if (!createRes.ok) throw new Error('Could not create the machine record.');
+      if (!createRes.ok) {
+        // Say which hop failed and what the server actually returned. "Could not
+        // create the machine record" told an operator nothing they could act on.
+        const body = await createRes.text().catch(() => '');
+        setPhase('error');
+        setError({
+          code: createRes.status === 502 ? 'ENGINE_UNREACHABLE' : `HTTP_${createRes.status}`,
+          message:
+            createRes.status === 502
+              ? 'The app reached the server, but the server could not reach the Machine Twin engine.'
+              : `Creating the machine record failed (HTTP ${createRes.status}). ${body.slice(0, 160)}`,
+          remediation:
+            createRes.status === 502
+              ? 'The engine is a local service. Run it alongside the app, or upload a ' +
+                '.glb / .gltf to view it directly in the browser instead.'
+              : 'Check you are signed in as an admin and try again.',
+        });
+        return;
+      }
       const project = await createRes.json();
 
       setPhase('uploading');
@@ -254,7 +272,16 @@ export function TwinUploader() {
         method: 'POST',
         body: form,
       });
-      if (!uploadRes.ok) throw new Error('Upload failed.');
+      if (!uploadRes.ok) {
+        const body = await uploadRes.text().catch(() => '');
+        setPhase('error');
+        setError({
+          code: `HTTP_${uploadRes.status}`,
+          message: `The upload was rejected (HTTP ${uploadRes.status}). ${body.slice(0, 160)}`,
+          remediation: 'Check the file is one of the listed formats and not corrupt.',
+        });
+        return;
+      }
 
       setPhase('processing');
       setDetail(cad ? 'Reading the assembly' : 'Solving camera positions');
