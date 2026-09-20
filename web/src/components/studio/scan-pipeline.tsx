@@ -63,10 +63,27 @@ interface CapabilityReport {
   capabilities: Record<string, { status: string; version?: string | null; remediation?: string }>;
 }
 
+const CAD_EXTENSIONS = ['.step', '.stp', '.gltf', '.glb', '.obj'] as const;
+function extensionOf(name: string): string {
+  const dot = name.lastIndexOf('.');
+  return dot === -1 ? '' : name.slice(dot).toLowerCase();
+}
+
+/**
+ * A CAD assembly and a photo capture are two routes to the same twin, and they
+ * do not share stages: CAD already states its parts, so it goes through a single
+ * import, while photographs have to be reconstructed and then authored. Choosing
+ * from what was actually selected keeps a CAD upload from being sent down a
+ * photogrammetry path that would reject it.
+ */
+function isCadUpload(files: File[]): boolean {
+  return files.some((f) => (CAD_EXTENSIONS as readonly string[]).includes(extensionOf(f.name)));
+}
+
 const STEPS: { key: StepKey; title: string; detail: string }[] = [
   { key: 'create', title: 'Create machine project', detail: 'Registers the machine with the twin engine' },
-  { key: 'upload', title: 'Upload & ingest photos', detail: 'Originals stored write-once; videos split into frames' },
-  { key: 'reconstruct', title: 'Reconstruct 3D mesh', detail: 'Camera poses + coverage check, then mesh' },
+  { key: 'upload', title: 'Upload & ingest files', detail: 'Originals stored write-once; videos split into frames' },
+  { key: 'reconstruct', title: 'Build 3D model', detail: 'CAD: read the assembly. Photos: camera poses, coverage check, then mesh' },
   { key: 'author', title: 'Author browser model', detail: 'Clean, decimate to LODs, export GLB + poster' },
 ];
 
@@ -234,6 +251,25 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
         upload: { ...prev.upload, note: `${ingested.length} file(s) stored${frames ? `, ${frames} video frame(s) extracted` : ''}` },
       }));
 
+      if (isCadUpload(files)) {
+        // One stage, not two: the assembly is imported directly, and there is no
+        // capture to measure coverage against.
+        const imported = await step('reconstruct', () =>
+          twin<{ state: string; lods: Lod[]; components: Component[] }>(
+            `action=stage&stage=cad&projectId=${encodeURIComponent(project.id)}`,
+            { method: 'POST' }
+          )
+        );
+        setLods([...imported.lods].sort((a, b) => a.lod - b.lod));
+        setComponents(imported.components);
+        setSteps((prev) => ({
+          ...prev,
+          reconstruct: { ...prev.reconstruct, note: 'CAD assembly imported — parts taken from the model' },
+          author: { state: 'skipped', note: 'not needed: the assembly is already a mesh' },
+        }));
+        return;
+      }
+
       const rec = await step('reconstruct', () =>
         twin<{ state: string; image_count: number; coverage: Coverage | null; mesh_provider: string | null }>(
           `action=stage&stage=reconstruct&projectId=${encodeURIComponent(project.id)}`,
@@ -381,14 +417,16 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                   : 'Choose walk-around photos or a video'}
               </div>
               <p className="text-[11px] text-slate-500 mt-1 max-w-md mx-auto">
-                Overlapping photos from all sides work best. The engine checks coverage and stops if it is not enough.
+                Upload a CAD assembly ({CAD_EXTENSIONS.join(' ')}) for a twin with separate,
+                nameable parts &mdash; or about 36 overlapping photographs, one roughly every 10
+                degrees, to reconstruct the machine as it stands. Coverage is checked, and a
+                capture that cannot reconstruct is refused rather than guessed at.
               </p>
             </button>
             <input
               ref={fileInput}
               type="file"
               multiple
-              accept="image/*,video/*"
               className="hidden"
               data-testid="scan-files"
               onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
