@@ -27,7 +27,19 @@ import type { MachineAsset } from '@/lib/types';
 const CAD_EXTENSIONS = ['.step', '.stp', '.gltf', '.glb', '.obj'] as const;
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.heic', '.mp4', '.mov'] as const;
 
-const ACCEPT = [...CAD_EXTENSIONS, ...IMAGE_EXTENSIONS].join(',');
+const SUPPORTED = [...CAD_EXTENSIONS, ...IMAGE_EXTENSIONS] as readonly string[];
+
+/**
+ * The file dialog is deliberately NOT restricted to those extensions.
+ *
+ * macOS resolves an `accept` list into system file types, and it recognises
+ * neither `.step` nor `.gltf` - so Finder greys those files out and an admin
+ * simply cannot pick the CAD file they were asked for. The browser never sees
+ * it, so there is nothing to report either.
+ *
+ * Validation happens below instead, where an unsupported file produces a message
+ * naming what is supported rather than a dialog that silently refuses to select.
+ */
 
 /** Photogrammetry needs a real walk-around; below this it cannot reconstruct. */
 const MIN_PHOTOS = 24;
@@ -86,6 +98,21 @@ export function TwinUploader() {
 
   const process = useCallback(async (files: File[]) => {
     if (files.length === 0) return;
+
+    const unsupported = files.filter(
+      (file) => !SUPPORTED.includes(extensionOf(file.name))
+    );
+    if (unsupported.length > 0) {
+      setPhase('error');
+      setError({
+        code: 'UNSUPPORTED_FILE_TYPE',
+        message: `Cannot read ${unsupported.map((f) => f.name).join(', ')}.`,
+        remediation:
+          `CAD: ${CAD_EXTENSIONS.join(' ')}. ` +
+          `Capture: ${IMAGE_EXTENSIONS.join(' ')}.`,
+      });
+      return;
+    }
 
     const cad = isCad(files);
     setSourceKind(cad ? 'cad' : 'photogrammetry');
@@ -207,7 +234,6 @@ export function TwinUploader() {
           id="twin-upload"
           type="file"
           multiple
-          accept={ACCEPT}
           className="hidden"
           onChange={(event) => {
             const files = Array.from(event.target.files ?? []);
