@@ -17,6 +17,9 @@ declare module 'react' {
           'camera-controls'?: boolean;
           'shadow-intensity'?: string;
           loading?: 'auto' | 'lazy' | 'eager';
+          /** When the model is shown. 'auto' displays it as soon as it loads. */
+          reveal?: 'auto' | 'interaction' | 'manual';
+          'auto-rotate'?: string;
         },
         HTMLElement
       >;
