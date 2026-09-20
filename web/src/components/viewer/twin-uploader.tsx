@@ -41,6 +41,9 @@ const SUPPORTED = [...CAD_EXTENSIONS, ...IMAGE_EXTENSIONS] as readonly string[];
  * naming what is supported rather than a dialog that silently refuses to select.
  */
 
+const TRANSPARENT_PIXEL =
+  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 /** Photogrammetry needs a real walk-around; below this it cannot reconstruct. */
 const MIN_PHOTOS = 24;
 
@@ -61,6 +64,38 @@ interface StageError {
 function extensionOf(name: string): string {
   const dot = name.lastIndexOf('.');
   return dot === -1 ? '' : name.slice(dot).toLowerCase();
+}
+
+/** Self-contained mesh formats the browser can render with no backend at all. */
+const BROWSER_RENDERABLE = ['.glb', '.gltf'] as const;
+
+/**
+ * Read the part names out of a glTF or GLB in the browser.
+ *
+ * A GLB is a 12-byte header followed by a JSON chunk; a .gltf is that JSON
+ * directly. Either way the node names are right there, so a CAD assembly can be
+ * listed and rendered without the engine ever being involved. That matters
+ * because the engine is a local service: it is not reachable from a deployed
+ * app, and a model the browser can already draw should not depend on it.
+ */
+async function readGltfParts(file: File): Promise<string[]> {
+  try {
+    let json: { nodes?: { name?: string }[] };
+    if (file.name.toLowerCase().endsWith('.glb')) {
+      const buffer = await file.arrayBuffer();
+      const view = new DataView(buffer);
+      if (view.getUint32(0, true) !== 0x46546c67) return [];
+      const jsonLength = view.getUint32(12, true);
+      json = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 20, jsonLength)));
+    } else {
+      json = JSON.parse(await file.text());
+    }
+    return (json.nodes ?? [])
+      .map((node) => node.name ?? '')
+      .filter((name) => name.startsWith('SKB_COMPONENT_'));
+  } catch {
+    return [];
+  }
 }
 
 function isCad(files: File[]): boolean {
@@ -85,6 +120,8 @@ export function TwinUploader() {
   const [components, setComponents] = useState<ComponentSummary[]>([]);
   const [selected, setSelected] = useState<ComponentSummary | null>(null);
   const [sourceKind, setSourceKind] = useState<'cad' | 'photogrammetry' | null>(null);
+  /** True when the model was rendered in the browser without the engine. */
+  const [localOnly, setLocalOnly] = useState(false);
 
   const reset = () => {
     setPhase('idle');
@@ -94,6 +131,7 @@ export function TwinUploader() {
     setComponents([]);
     setSelected(null);
     setSourceKind(null);
+    setLocalOnly(false);
   };
 
   const process = useCallback(async (files: File[]) => {
@@ -136,7 +174,66 @@ export function TwinUploader() {
       return;
     }
 
+    // The engine adds levels of detail, a poster and a stored project. None of
+    // that is needed to *show* a self-contained model, so when it cannot be
+    // reached - which is the normal case on a deployed app, since it is a local
+    // service - a glTF or GLB is rendered directly instead of failing.
+    const renderable =
+      files.length === 1 &&
+      (BROWSER_RENDERABLE as readonly string[]).includes(extensionOf(files[0].name));
+
+    let engineUp = false;
     try {
+      const probe = await fetch('/api/twin?action=capabilities');
+      engineUp = probe.ok;
+    } catch {
+      engineUp = false;
+    }
+
+    if (!engineUp) {
+      if (!renderable) {
+        setPhase('error');
+        setError({
+          code: 'ENGINE_UNAVAILABLE',
+          message: 'The Machine Twin engine is not reachable from here.',
+          remediation:
+            'STEP files and photo reconstruction are processed by the engine. ' +
+            'Upload a .glb or .gltf to view it directly in the browser, or run ' +
+            'the engine locally for the full pipeline.',
+        });
+        return;
+      }
+
+      setPhase('processing');
+      setDetail('Reading the assembly');
+      const parts = await readGltfParts(files[0]);
+      setComponents(
+        parts.map((stableId) => ({
+          stable_id: stableId,
+          label: 'unknown_component',
+          validation_status: 'review_required',
+        }))
+      );
+      setAsset({
+        orgId: 'local',
+        assetId: 'local-preview',
+        name: files[0].name,
+        // Object URL: the file never leaves the browser on this path.
+        glbUrl: URL.createObjectURL(files[0]),
+        // No poster exists on this path - the engine renders those. A transparent
+        // pixel keeps the 2D fallback from showing a broken image if the model
+        // itself fails to load.
+        posterUrl: TRANSPARENT_PIXEL,
+        hotspots: [],
+      });
+      setLocalOnly(true);
+      setPhase('done');
+      setDetail('');
+      return;
+    }
+
+    try {
+      setLocalOnly(false);
       setPhase('creating');
       setDetail(files[0].name);
       const createRes = await fetch('/api/twin?action=create', {
@@ -286,9 +383,11 @@ export function TwinUploader() {
             <Check className="h-4 w-4 shrink-0 text-emerald-400" />
             <span>
               {components.length} component{components.length === 1 ? '' : 's'} &middot;{' '}
-              {sourceKind === 'cad'
+              {localOnly
+                ? 'rendered in your browser — levels of detail and a stored twin need the engine'
+                : sourceKind === 'cad'
                 ? 'from the assembly’s own part structure'
-                : 'reconstructed from photographs — a scan is one merged surface, so parts need review'}
+                  : 'reconstructed from photographs — a scan is one merged surface, so parts need review'}
             </span>
           </div>
         )}
