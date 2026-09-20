@@ -40,13 +40,20 @@ const REPO = join(HERE, '..', '..');
 const WEB = join(REPO, 'web');
 const OUT = join(WEB, '.amplify-hosting');
 const ZIP = join(WEB, '.amplify-hosting.zip');
-const PROFILE = process.env.AWS_PROFILE ?? 'skillbridge';
-const REGION = 'ap-northeast-1';
+/**
+ * Credentials come from the environment like any other AWS tool.
+ *
+ * `AWS_PROFILE` when the caller has named profiles; nothing at all in CI,
+ * where the role is already assumed. Previously this forced
+ * `--profile skillbridge`, so the script only ran on the one laptop that had
+ * that profile — and it pointed at a Windows install path, so it could not run
+ * on a Mac or in CI at all.
+ */
+const PROFILE = process.env.AWS_PROFILE ?? '';
+const REGION = process.env.AWS_REGION ?? 'ap-northeast-1';
 
-// `aws` is a user-level install and is not on PATH for spawned shells.
-const AWS =
-  process.env.AWS_CLI ??
-  'C:/Users/nagwa/AppData/Local/Programs/Amazon/AWSCLIV2/aws.exe';
+/** Override with AWS_CLI if the CLI is not on PATH. */
+const AWS = process.env.AWS_CLI ?? 'aws';
 
 const arg = (name, fallback) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -54,7 +61,9 @@ const arg = (name, fallback) => {
 };
 
 const aws = (args, { json = true } = {}) => {
-  const out = execFileSync(AWS, [...args, '--profile', PROFILE, '--region', REGION], {
+  const scoped = [...args, '--region', REGION];
+  if (PROFILE) scoped.push('--profile', PROFILE);
+  const out = execFileSync(AWS, scoped, {
     encoding: 'utf8',
     maxBuffer: 32 * 1024 * 1024,
   });
