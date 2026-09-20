@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   FileText,
   BarChart3,
-  Database,
   Cpu,
   Layers,
   Radio,
@@ -325,14 +324,6 @@ export default function SimulationStudioPage() {
   });
   const [workOrderSigned, setWorkOrderSigned] = useState(false);
 
-  // API Tester State
-  const [apiEndpoint, setApiEndpoint] = useState('/api/twin?action=capabilities');
-  const [apiMethod, setApiMethod] = useState<'GET' | 'POST' | 'PATCH'>('GET');
-  const [apiPayload, setApiPayload] = useState('{}');
-  const [apiResult, setApiResult] = useState<string | null>(null);
-  const [apiLoading, setApiLoading] = useState(false);
-  const [apiDuration, setApiDuration] = useState<number | null>(null);
-
   // Initialize Voice Channel WebSocket connection on mount
   useEffect(() => {
     let ch: VoiceChannel | null = null;
@@ -550,40 +541,6 @@ export default function SimulationStudioPage() {
   };
 
   // Execute API Test
-  const runApiCall = async (endpoint: string, method: string, body?: string) => {
-    setApiLoading(true);
-    setApiResult(null);
-    const start = performance.now();
-    try {
-      const options: RequestInit = { method };
-      if (method === 'POST' || method === 'PATCH') {
-        options.headers = { 'Content-Type': 'application/json' };
-        options.body = body;
-      }
-      const res = await fetch(endpoint, options);
-      const json = await res.json();
-      const end = performance.now();
-      setApiDuration(Math.round(end - start));
-      setApiResult(
-        JSON.stringify(
-          {
-            httpStatus: `${res.status} ${res.statusText}`,
-            ok: res.ok,
-            durationMs: Math.round(end - start),
-            responseBody: json,
-          },
-          null,
-          2
-        )
-      );
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setApiResult(JSON.stringify({ error: msg }, null, 2));
-    } finally {
-      setApiLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* ── Top Enterprise Header ────────────────────────────────────────── */}
@@ -718,18 +675,6 @@ export default function SimulationStudioPage() {
               <span>Department Skill Radar</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('api')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
-                activeTab === 'api'
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-              }`}
-            >
-              <Database className="w-4 h-4" />
-              <span>AWS & DynamoDB Live Console</span>
-            </button>
           </nav>
 
           {/* Engine status, from a real probe rather than an assertion. */}
@@ -1412,172 +1357,6 @@ export default function SimulationStudioPage() {
         )}
 
         {/* TAB 5: AWS ARCHITECTURE & DYNAMODB LIVE CONSOLE */}
-        {activeTab === 'api' && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-5xl mx-auto">
-            <div className="pb-4 mb-6 border-b border-slate-800">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950/60 px-2.5 py-0.5 rounded border border-blue-800/60">
-                  DYNAMODB & MACHINE TWIN ENGINE
-                </span>
-                <span className="text-xs font-mono text-cyan-400">
-                  AppTable (PK/SK) + FastAPI (:8000)
-                </span>
-              </div>
-              <h2 className="text-lg font-bold text-white mt-1">
-                Single-Table & Photogrammetry Endpoints Verification Console
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Directly execute the backend route handlers and query the live Machine Twin photogrammetry engine.
-              </p>
-            </div>
-
-            {/* Quick API Buttons */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/twin?action=capabilities');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/twin?action=capabilities', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-cyan-400">GET /capabilities</div>
-                <div className="text-[10px] text-slate-400 mt-1">Photogrammetry (:8000)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/twin?action=projects');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/twin?action=projects', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-cyan-400">GET /projects</div>
-                <div className="text-[10px] text-slate-400 mt-1">Scan Projects (:8000)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/me');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/me', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-blue-400">GET /api/me</div>
-                <div className="text-[10px] text-slate-400 mt-1">Profile (W1)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/plan');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/plan', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-blue-400">GET /api/plan</div>
-                <div className="text-[10px] text-slate-400 mt-1">Learning Plan (W2)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/lessons');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/lessons', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-blue-400">GET /api/lessons</div>
-                <div className="text-[10px] text-slate-400 mt-1">3D Assets (W3)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/assessments');
-                  setApiMethod('POST');
-                  const p = JSON.stringify(
-                    {
-                      assessmentId: 'asmt_hydraulics_01',
-                      score: 95,
-                      feedback: 'Correctly diagnosed relief valve pilot cavitation',
-                    },
-                    null,
-                    2
-                  );
-                  setApiPayload(p);
-                  runApiCall('/api/assessments', 'POST', p);
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-emerald-400">POST /api/assessments</div>
-                <div className="text-[10px] text-slate-400 mt-1">Submit Attempt (W4)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/aggregates');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/aggregates', 'GET');
-                }}
-                className="p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold text-blue-400">GET /api/aggregates</div>
-                <div className="text-[10px] text-slate-400 mt-1">GetItem (M2/M3)</div>
-              </button>
-            </div>
-
-            {/* Request / Response Pane */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold font-mono text-slate-300">REQUEST PARAMS:</span>
-                  <button
-                    type="button"
-                    onClick={() => runApiCall(apiEndpoint, apiMethod, apiPayload)}
-                    disabled={apiLoading}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1 rounded font-semibold transition"
-                  >
-                    {apiLoading ? 'Invoking...' : 'Execute Request'}
-                  </button>
-                </div>
-                <textarea
-                  value={apiPayload}
-                  onChange={(e) => setApiPayload(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-cyan-300 h-[240px] focus:outline-none focus:border-blue-500 resize-none"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold font-mono text-slate-300">RESPONSE PAYLOAD:</span>
-                  {apiDuration && (
-                    <span className="text-[11px] font-mono text-emerald-400">
-                      Duration: {apiDuration}ms
-                    </span>
-                  )}
-                </div>
-                <pre className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-emerald-400 h-[240px] overflow-auto">
-                  {apiResult || '// Click any endpoint button above to inspect live output'}
-                </pre>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
