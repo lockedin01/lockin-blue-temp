@@ -414,7 +414,7 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
               <div className="text-xs font-bold text-slate-200">
                 {files.length
                   ? `${files.length} file(s) selected · ${fmtBytes(files.reduce((n, f) => n + f.size, 0))}`
-                  : 'Choose walk-around photos or a video'}
+                  : 'Choose a CAD assembly, walk-around photos, or a video'}
               </div>
               <p className="text-[11px] text-slate-500 mt-1 max-w-md mx-auto">
                 Upload a CAD assembly ({CAD_EXTENSIONS.join(' ')}) for a twin with separate,
