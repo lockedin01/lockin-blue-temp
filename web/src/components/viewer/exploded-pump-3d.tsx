@@ -7,6 +7,13 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 interface ExplodedPump3DProps {
   onSelectComponent?: (componentId: string, label: string) => void;
   selectedComponentId?: string | null;
+  /**
+   * Leave the scene unpainted so the page shows through. Used where the pump
+   * is a subject rather than a tool — the landing page stands it in the gap
+   * between two lines of the wordmark, and a white plate behind it would hide
+   * the lower line.
+   */
+  transparent?: boolean;
 }
 
 // 12 distinct mechanical subassemblies that translate along the X axis
@@ -125,6 +132,7 @@ function createCastIronNoiseTexture(): THREE.CanvasTexture {
 export function ExplodedPump3D({
   onSelectComponent,
   selectedComponentId,
+  transparent = false,
 }: ExplodedPump3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -140,8 +148,9 @@ export function ExplodedPump3D({
   // Interactive UI state for the exploded-view controls
   const [explodePct, setExplodePct] = useState(65);
   const explodePctRef = useRef(65);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const isSpinningRef = useRef(false);
+  // As a subject the machine has no controls, so it turns on its own.
+  const [isSpinning, setIsSpinning] = useState(transparent);
+  const isSpinningRef = useRef(transparent);
   const [showControls, setShowControls] = useState(true);
   const [showAllLabels, setShowAllLabels] = useState(true);
   const [screenCoords, setScreenCoords] = useState<Record<string, { x: number; y: number }>>({});
@@ -203,7 +212,7 @@ export function ExplodedPump3D({
 
     // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#FFFFFF');
+    if (!transparent) scene.background = new THREE.Color('#FFFFFF');
     sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
@@ -859,7 +868,15 @@ export function ExplodedPump3D({
   };
 
   return (
-    <div className="relative w-full h-[580px] sm:h-[640px] bg-white rounded-2xl overflow-hidden border border-slate-300 shadow-sm select-none">
+    <div
+      className={
+        transparent
+          ? // A subject, not a panel: no plate, no border, no fixed height —
+            // it fills whatever box the page gives it.
+            'relative w-full h-full select-none'
+          : 'relative w-full h-[580px] sm:h-[640px] bg-white rounded-2xl overflow-hidden border border-slate-300 shadow-sm select-none'
+      }
+    >
       {/* -------------------------------------------------------------
          TOP APP BAR
          ------------------------------------------------------------- */}
