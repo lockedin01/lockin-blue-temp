@@ -542,27 +542,27 @@ export default function SimulationStudioPage() {
 
   // Execute API Test
   return (
-    <div className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-background text-primary-foreground flex flex-col font-sans selection:bg-primary selection:text-primary-foreground">
       {/* ── Top Enterprise Header ────────────────────────────────────────── */}
-      <header className="border-b border-slate-800/90 bg-[#0c121e]/95 sticky top-0 z-50 backdrop-blur-md">
+      <header className="border-b border-border bg-background/95 sticky top-0 z-50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
           {/* Brand & Plant Metadata */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-blue-500/20">
-              <div className="w-full h-full bg-[#080c14] rounded-[10px] flex items-center justify-center">
-                <Layers className="w-5 h-5 text-cyan-400" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary via-primary to-primary p-0.5 shadow-lg shadow-primary/25">
+              <div className="w-full h-full bg-background rounded-[10px] flex items-center justify-center">
+                <Layers className="w-5 h-5 text-primary" />
               </div>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-white">
+                <span className="font-extrabold text-base tracking-tight text-foreground">
                   SkillBridge
                 </span>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 font-semibold">
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-accent text-primary border border-primary/40 font-semibold">
                   Twin Studio
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 truncate hidden sm:block">
+              <p className="text-[11px] text-muted-foreground truncate hidden sm:block">
                 Tata Motors Ltd · Plant 1 (Fluid Power Division, Bay 4B)
               </p>
             </div>
@@ -571,24 +571,24 @@ export default function SimulationStudioPage() {
           {/* Quick Role & Language Switches */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Operator Badge */}
-            <div className="hidden md:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3 py-1.5 rounded-lg text-xs">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-slate-400">Tech:</span>
-              <span className="font-semibold text-slate-200">Vikram Sharma</span>
-              <span className="text-[10px] bg-slate-800 text-cyan-300 px-1.5 py-0.5 rounded font-mono">
+            <div className="hidden md:flex items-center gap-2 bg-card border border-border px-3 py-1.5 rounded-lg text-xs">
+              <div className="w-2 h-2 rounded-full bg-success-muted animate-pulse" />
+              <span className="text-muted-foreground">Tech:</span>
+              <span className="font-semibold text-foreground">Vikram Sharma</span>
+              <span className="text-[10px] bg-muted text-primary px-1.5 py-0.5 rounded font-mono">
                 L2 Tech
               </span>
             </div>
 
             {/* Language Switcher */}
-            <div className="flex bg-slate-900 border border-slate-800 rounded-lg p-0.5 text-xs">
+            <div className="flex bg-card border border-border rounded-lg p-0.5 text-xs">
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
                 className={`px-2.5 py-1 rounded-md font-medium transition ${
                   language === 'en'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-primary text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 EN
@@ -598,8 +598,8 @@ export default function SimulationStudioPage() {
                 onClick={() => setLanguage('hi')}
                 className={`px-2.5 py-1 rounded-md font-medium transition ${
                   language === 'hi'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-primary text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 हिंदी
@@ -611,24 +611,24 @@ export default function SimulationStudioPage() {
               type="button"
               onClick={() => setA11yEnabled(!a11yEnabled)}
               title="Toggle between 3D GLB Model and 2D Low-Bandwidth Schematic"
-              className="text-xs bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
+              className="text-xs bg-card hover:bg-muted border border-border text-foreground px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
             >
-              {prefer2D ? <FileText className="w-3.5 h-3.5 text-amber-400" /> : <Layers className="w-3.5 h-3.5 text-blue-400" />}
+              {prefer2D ? <FileText className="w-3.5 h-3.5 text-warning" /> : <Layers className="w-3.5 h-3.5 text-primary" />}
               <span className="hidden sm:inline">{prefer2D ? '2D Schematic' : '3D Twin'}</span>
             </button>
           </div>
         </div>
 
         {/* Navigation Tabs Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-t border-slate-800/60 overflow-x-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between border-t border-border overflow-x-auto">
           <nav className="flex space-x-1 sm:space-x-2 py-1.5">
             <button
               type="button"
               onClick={() => setActiveTab('twin')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'twin'
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  ? 'bg-accent text-primary border border-primary/40'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <Cpu className="w-4 h-4" />
@@ -641,11 +641,11 @@ export default function SimulationStudioPage() {
               onClick={() => setActiveTab('scanner')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'scanner'
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  ? 'bg-accent text-primary border border-primary/40'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
-              <Camera className="w-4 h-4 text-cyan-400" />
+              <Camera className="w-4 h-4 text-primary" />
               <span>3D Photogrammetry Scanner (:8000)</span>
             </button>
 
@@ -654,8 +654,8 @@ export default function SimulationStudioPage() {
               onClick={() => setActiveTab('sop')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'sop'
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  ? 'bg-accent text-primary border border-primary/40'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <FileText className="w-4 h-4" />
@@ -667,8 +667,8 @@ export default function SimulationStudioPage() {
               onClick={() => setActiveTab('analytics')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition whitespace-nowrap ${
                 activeTab === 'analytics'
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/40'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  ? 'bg-accent text-primary border border-primary/40'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
@@ -678,14 +678,14 @@ export default function SimulationStudioPage() {
           </nav>
 
           {/* Engine status, from a real probe rather than an assertion. */}
-          <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono text-slate-400 pl-4">
+          <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono text-muted-foreground pl-4">
             <span
               className={
                 engineUp === null
-                  ? 'w-1.5 h-1.5 rounded-full bg-slate-500'
+                  ? 'w-1.5 h-1.5 rounded-full bg-muted-foreground/20'
                   : engineUp
-                    ? 'w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse'
-                    : 'w-1.5 h-1.5 rounded-full bg-slate-600'
+                    ? 'w-1.5 h-1.5 rounded-full bg-success-muted animate-pulse'
+                    : 'w-1.5 h-1.5 rounded-full bg-muted-foreground/20'
               }
             />
             <span>
@@ -700,36 +700,36 @@ export default function SimulationStudioPage() {
       </header>
 
       {/* ── Industrial Machinery Telemetry Strip ───────────────────────── */}
-      <section className="bg-[#0b101c] border-b border-slate-800/80 px-4 sm:px-6 py-2 text-xs">
+      <section className="bg-background border-b border-border px-4 sm:px-6 py-2 text-xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-y-2">
-          <div className="flex items-center gap-2 text-slate-300 font-medium">
-            <span className="text-cyan-400 font-mono font-bold">EQUIPMENT:</span>
+          <div className="flex items-center gap-2 text-foreground font-medium">
+            <span className="text-primary font-mono font-bold">EQUIPMENT:</span>
             <span className="truncate">{activeAsset.name}</span>
-            <span className="text-[10px] bg-slate-800 text-slate-400 font-mono px-1.5 py-0.5 rounded">
+            <span className="text-[10px] bg-muted text-muted-foreground font-mono px-1.5 py-0.5 rounded">
               SN: RX-9942-A10
             </span>
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6 text-[11px] font-mono">
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500">PRESSURE:</span>
-              <span className="font-bold text-emerald-400">210.4 Bar</span>
+              <span className="text-muted-foreground">PRESSURE:</span>
+              <span className="font-bold text-success">210.4 Bar</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500">CASE DRAIN:</span>
-              <span className="font-bold text-cyan-400">1.2 L/min</span>
+              <span className="text-muted-foreground">CASE DRAIN:</span>
+              <span className="font-bold text-primary">1.2 L/min</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500">OIL TEMP:</span>
-              <span className="font-bold text-amber-400">58.2°C</span>
+              <span className="text-muted-foreground">OIL TEMP:</span>
+              <span className="font-bold text-warning">58.2°C</span>
             </div>
             <div className="hidden md:flex items-center gap-1.5">
-              <span className="text-slate-500">RPM:</span>
-              <span className="font-bold text-slate-200">1,450</span>
+              <span className="text-muted-foreground">RPM:</span>
+              <span className="font-bold text-foreground">1,450</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="text-emerald-400 font-semibold uppercase text-[10px]">Active</span>
+              <span className="w-2 h-2 rounded-full bg-success-muted" />
+              <span className="text-success font-semibold uppercase text-[10px]">Active</span>
             </div>
           </div>
         </div>
@@ -742,15 +742,15 @@ export default function SimulationStudioPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left 7 Columns: 3D Twin Viewport & Part Selector */}
             <div className="lg:col-span-7 flex flex-col gap-4">
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 relative shadow-xl backdrop-blur-sm">
+              <div className="bg-card border border-border rounded-2xl p-4 relative shadow-xl backdrop-blur-sm">
                 {/* 3D Viewport Controls HUD */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-xs">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-border text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                      <Radio className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+                    <span className="font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-primary animate-pulse" />
                       Digital Twin Model
                     </span>
-                    <span className="text-[10px] text-cyan-400 font-mono bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40">
+                    <span className="text-[10px] text-primary font-mono bg-accent px-2 py-0.5 rounded border border-primary/40">
                       Live GLB: {activeAsset.assetId}
                     </span>
                   </div>
@@ -761,8 +761,8 @@ export default function SimulationStudioPage() {
                       onClick={() => setAutoRotate(!autoRotate)}
                       className={`px-2.5 py-1 rounded-md text-[11px] font-medium border transition ${
                         autoRotate
-                          ? 'bg-blue-600 text-white border-blue-500'
-                          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                          ? 'bg-primary text-foreground border-primary/40'
+                          : 'bg-muted text-foreground border-border hover:bg-muted-foreground/20'
                       }`}
                     >
                       <RefreshCw className={`w-3 h-3 inline mr-1 ${autoRotate ? 'animate-spin' : ''}`} />
@@ -771,16 +771,16 @@ export default function SimulationStudioPage() {
                     <button
                       type="button"
                       onClick={() => setActiveTab('scanner')}
-                      className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition flex items-center gap-1"
+                      className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-muted hover:bg-muted-foreground/20 text-foreground border border-border transition flex items-center gap-1"
                     >
-                      <Camera className="w-3 h-3 text-cyan-400" />
+                      <Camera className="w-3 h-3 text-primary" />
                       <span>Scan New</span>
                     </button>
                   </div>
                 </div>
 
                 {/* 3D Viewer Container */}
-                <div className="relative rounded-xl overflow-hidden border border-slate-800/80 shadow-inner">
+                <div className="relative rounded-xl overflow-hidden border border-border shadow-inner">
                   <MachineViewer
                     asset={activeAsset}
                     selectedPartId={selectedPartId}
@@ -789,15 +789,15 @@ export default function SimulationStudioPage() {
                   />
 
                   {/* Hotspot Instructions Overlay */}
-                  <div className="absolute bottom-3 left-3 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+                  <div className="absolute bottom-3 left-3 bg-muted backdrop-blur-md px-3 py-1.5 rounded-lg border border-border text-[11px] text-foreground flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
                     <span>Tap numbered pins 1-4 on the model to inspect part diagnostics</span>
                   </div>
                 </div>
 
                 {/* Interactive Component Card Selector */}
                 <div className="mt-4">
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block mb-2">
                     Machinery Components Subsystems:
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -810,30 +810,30 @@ export default function SimulationStudioPage() {
                           onClick={() => handlePartSelected(comp.id)}
                           className={`p-2.5 rounded-xl border text-left transition relative flex flex-col justify-between ${
                             isSelected
-                              ? 'bg-blue-600/20 border-blue-500 shadow-md ring-1 ring-blue-400'
-                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/60'
+                              ? 'bg-accent border-primary/40 shadow-md ring-1 ring-blue-400'
+                              : 'bg-muted border-border hover:border-border hover:bg-card'
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-300 flex items-center justify-center font-mono font-bold text-[10px]">
+                            <span className="w-5 h-5 rounded-full bg-accent text-primary flex items-center justify-center font-mono font-bold text-[10px]">
                               {idx + 1}
                             </span>
                             <span
                               className={`text-[9px] px-1.5 py-0.5 rounded font-bold font-mono ${
                                 comp.status === 'OPTIMAL'
-                                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                  ? 'bg-success-muted text-success border border-success/40'
                                   : comp.status === 'ATTENTION'
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
-                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                                  ? 'bg-warning-muted text-warning border border-warning/40'
+                                  : 'bg-danger-muted text-danger border border-danger/40'
                               }`}
                             >
                               {comp.status}
                             </span>
                           </div>
-                          <div className="font-semibold text-xs text-slate-200 truncate">
+                          <div className="font-semibold text-xs text-foreground truncate">
                             {comp.name}
                           </div>
-                          <div className="text-[10px] text-slate-400 font-mono mt-1">
+                          <div className="text-[10px] text-muted-foreground font-mono mt-1">
                             {comp.code}
                           </div>
                         </button>
@@ -849,50 +849,50 @@ export default function SimulationStudioPage() {
               <TwinUploader />
 
               {/* Active Component Specifications & Hazard Card */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-800">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-lg">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-border">
                   <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <Wrench className="w-4 h-4 text-blue-400" />
+                    <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                      <Wrench className="w-4 h-4 text-primary" />
                       {currentPart.name}
                     </h3>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">
+                    <p className="text-xs text-muted-foreground font-mono mt-0.5">
                       {currentPart.subsystem}
                     </p>
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-md bg-slate-800 text-blue-300 font-mono border border-slate-700">
+                  <span className="text-xs px-2.5 py-1 rounded-md bg-muted text-primary font-mono border border-border">
                     SOP: {currentPart.sop.id}
                   </span>
                 </div>
 
                 {/* Specs Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-                  <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-[10px] text-slate-500 block uppercase">Operating Pressure</span>
-                    <span className="text-xs font-bold font-mono text-cyan-300">{currentPart.specs.pressure}</span>
+                  <div className="bg-muted p-2 rounded-lg border border-border">
+                    <span className="text-[10px] text-muted-foreground block uppercase">Operating Pressure</span>
+                    <span className="text-xs font-bold font-mono text-primary">{currentPart.specs.pressure}</span>
                   </div>
-                  <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-[10px] text-slate-500 block uppercase">Flow Rating</span>
-                    <span className="text-xs font-bold font-mono text-cyan-300">{currentPart.specs.flow}</span>
+                  <div className="bg-muted p-2 rounded-lg border border-border">
+                    <span className="text-[10px] text-muted-foreground block uppercase">Flow Rating</span>
+                    <span className="text-xs font-bold font-mono text-primary">{currentPart.specs.flow}</span>
                   </div>
-                  <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-[10px] text-slate-500 block uppercase">Temp Ceiling</span>
-                    <span className="text-xs font-bold font-mono text-amber-300">{currentPart.specs.tempLimit}</span>
+                  <div className="bg-muted p-2 rounded-lg border border-border">
+                    <span className="text-[10px] text-muted-foreground block uppercase">Temp Ceiling</span>
+                    <span className="text-xs font-bold font-mono text-warning">{currentPart.specs.tempLimit}</span>
                   </div>
-                  <div className="bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                    <span className="text-[10px] text-slate-500 block uppercase">Torque Rating</span>
-                    <span className="text-xs font-bold font-mono text-emerald-300">{currentPart.specs.torque}</span>
+                  <div className="bg-muted p-2 rounded-lg border border-border">
+                    <span className="text-[10px] text-muted-foreground block uppercase">Torque Rating</span>
+                    <span className="text-xs font-bold font-mono text-success">{currentPart.specs.torque}</span>
                   </div>
                 </div>
 
                 {/* Mandatory Safety Alert */}
-                <div className="bg-amber-950/30 border border-amber-500/40 rounded-xl p-3 flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                <div className="bg-warning-muted border border-warning/40 rounded-xl p-3 flex items-start gap-3">
+                  <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-bold text-amber-300 uppercase tracking-wide">
+                    <div className="text-xs font-bold text-warning uppercase tracking-wide">
                       Mandatory Safety Procedure (OSHA / ISO 4413):
                     </div>
-                    <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed">
+                    <p className="text-xs text-warning mt-0.5 leading-relaxed">
                       {currentPart.sop.hazardAlert}
                     </p>
                   </div>
@@ -901,47 +901,47 @@ export default function SimulationStudioPage() {
                 {/* Into the authored internals. See TRAINING_COMPONENT_MAP. */}
                 <Link
                   href={trainingSimHref(selectedPartId)}
-                  className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-blue-500/40 bg-blue-950/30 px-4 py-3 transition hover:bg-blue-900/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-400"
+                  className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-primary/40 bg-accent px-4 py-3 transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
                 >
                   <span>
-                    <span className="block text-xs font-bold uppercase tracking-wide text-blue-300">
+                    <span className="block text-xs font-bold uppercase tracking-wide text-primary">
                       Open Training Simulation
                     </span>
-                    <span className="mt-0.5 block text-xs text-blue-200/80">
+                    <span className="mt-0.5 block text-xs text-primary">
                       Exploded assembly, internal components, operating sequence
                     </span>
                   </span>
-                  <ArrowRight className="h-5 w-5 shrink-0 text-blue-300" />
+                  <ArrowRight className="h-5 w-5 shrink-0 text-primary" />
                 </Link>
               </div>
             </div>
 
             {/* Right 5 Columns: AI Voice Diagnostic Copilot */}
             <div className="lg:col-span-5 flex flex-col gap-4">
-              <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col min-h-[580px]">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-xl flex flex-col min-h-[580px]">
                 {/* Copilot Header */}
-                <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-border">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-white">Voice Diagnostic Copilot</span>
+                      <span className="font-bold text-sm text-foreground">Voice Diagnostic Copilot</span>
                       {channelState === 'ready' ? (
-                        <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[10px] bg-success-muted text-success border border-success/40 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-success-muted animate-pulse" />
                           Live
                         </span>
                       ) : channelState === 'connecting' ? (
-                        <span className="text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                        <span className="text-[10px] bg-warning-muted text-warning border border-warning/40 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-warning-muted animate-ping" />
                           Connecting...
                         </span>
                       ) : (
-                        <span className="text-[10px] bg-slate-500/10 text-slate-400 border border-slate-500/30 px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                        <span className="text-[10px] bg-muted-foreground/20 text-muted-foreground border border-border px-2 py-0.5 rounded-full font-mono font-bold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/20" />
                           {language === 'hi' ? 'वॉइस ऑफ़लाइन' : 'Voice offline'}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       Grounded in factory SOPs · Bedrock Haiku SigV4 · Sarvam Speech Multi-Lingual
                     </p>
                   </div>
@@ -949,17 +949,17 @@ export default function SimulationStudioPage() {
                   {/* Latency & Live VU Equalizer */}
                   <div className="flex items-center gap-2">
                     {isRecording && micLevel > 0 ? (
-                      <div className="flex items-center gap-0.5 h-5 px-2 bg-rose-950/60 border border-rose-800/80 rounded-md">
+                      <div className="flex items-center gap-0.5 h-5 px-2 bg-danger-muted border border-danger/40 rounded-md">
                         {[0.3, 0.7, 1.0, 0.8, 0.5, 0.9, 0.4].map((mult, idx) => (
                           <span
                             key={idx}
-                            className="w-1 bg-rose-500 rounded-full transition-all duration-75"
+                            className="w-1 bg-danger-muted rounded-full transition-all duration-75"
                             style={{ height: `${Math.max(4, Math.min(18, micLevel * 26 * mult + 4))}px` }}
                           />
                         ))}
                       </div>
                     ) : (isRecording || isSpeaking) ? (
-                      <div className="flex items-center gap-1 h-5 px-2 bg-blue-950/60 border border-blue-800/80 rounded-md">
+                      <div className="flex items-center gap-1 h-5 px-2 bg-accent border border-primary/40 rounded-md">
                         <span className="soundwave-bar" />
                         <span className="soundwave-bar" />
                         <span className="soundwave-bar" />
@@ -969,7 +969,7 @@ export default function SimulationStudioPage() {
                     ) : null}
                     {latencyMs !== null && (
                       <div
-                        className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-800"
+                        className="text-[10px] font-mono text-muted-foreground bg-muted px-2 py-1 rounded border border-border"
                         title={language === 'hi' ? 'सवाल भेजने से उत्तर के पहले शब्द तक (मापा गया)' : 'Measured: question sent → first word of the answer'}
                       >
                         {language === 'hi' ? 'पहला शब्द' : 'first word'} {latencyMs}ms
@@ -979,11 +979,11 @@ export default function SimulationStudioPage() {
                 </div>
 
                 {/* Conversation History & Stream Feed */}
-                <div className="flex-1 bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 overflow-y-auto max-h-[380px] flex flex-col gap-3">
+                <div className="flex-1 bg-muted border border-border rounded-xl p-3.5 overflow-y-auto max-h-[380px] flex flex-col gap-3">
                   {/* Previous Turns */}
                   {history.length > 0 && (
-                    <div className="space-y-2.5 border-b border-slate-800/80 pb-3 mb-1">
-                      <span className="text-[10px] font-mono uppercase text-slate-500 font-bold tracking-wider">
+                    <div className="space-y-2.5 border-b border-border pb-3 mb-1">
+                      <span className="text-[10px] font-mono uppercase text-muted-foreground font-bold tracking-wider">
                         Active Shift Dialogue:
                       </span>
                       {history.slice(-4).map((turn, i) => (
@@ -991,12 +991,12 @@ export default function SimulationStudioPage() {
                           key={i}
                           className={`text-xs p-3 rounded-xl leading-relaxed ${
                             turn.role === 'worker'
-                              ? 'bg-blue-950/40 text-blue-200 border border-blue-900/40 ml-4'
-                              : 'bg-slate-900/80 text-slate-200 border border-slate-800 mr-4'
+                              ? 'bg-accent text-primary border border-primary/40 ml-4'
+                              : 'bg-card text-foreground border border-border mr-4'
                           }`}
                         >
-                          <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1 font-mono">
-                            <span className="font-bold text-slate-400">
+                          <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1 font-mono">
+                            <span className="font-bold text-muted-foreground">
                               {turn.role === 'worker' ? 'TECHNICIAN' : 'AI TUTOR'}
                             </span>
                             <span>{turn.timestamp}</span>
@@ -1009,17 +1009,17 @@ export default function SimulationStudioPage() {
 
                   {/* Active Question Transcript */}
                   {transcript ? (
-                    <div className="bg-blue-600/20 border border-blue-500/40 text-blue-100 rounded-xl p-3 text-xs self-end max-w-[92%] shadow-sm">
-                      <div className="text-[10px] font-mono text-blue-300 font-bold mb-1">
+                    <div className="bg-accent border border-primary/40 text-primary rounded-xl p-3 text-xs self-end max-w-[92%] shadow-sm">
+                      <div className="text-[10px] font-mono text-primary font-bold mb-1">
                         TECHNICIAN QUERY (VOICE / PTT)
                       </div>
                       <p className="leading-relaxed">{transcript}</p>
                     </div>
                   ) : (
-                    <div className="text-center my-auto py-8 text-slate-500 text-xs">
-                      <Mic className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+                    <div className="text-center my-auto py-8 text-muted-foreground text-xs">
+                      <Mic className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                       <p className="font-medium">Press and hold the PTT button or click a prompt below</p>
-                      <p className="text-[11px] text-slate-600 mt-1">
+                      <p className="text-[11px] text-muted-foreground mt-1">
                         Works in English and Hindi directly on the shop floor
                       </p>
                     </div>
@@ -1027,64 +1027,64 @@ export default function SimulationStudioPage() {
 
                   {/* AI Thinking Pulse */}
                   {aiThinking && (
-                    <div className="flex items-center gap-2 text-xs text-blue-400 font-mono py-1">
-                      <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping" />
+                    <div className="flex items-center gap-2 text-xs text-primary font-mono py-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
                       <span>{language === 'hi' ? 'उत्तर तैयार हो रहा है...' : 'Preparing the answer...'}</span>
                     </div>
                   )}
 
                   {/* Streaming AI Diagnostic Response */}
                   {aiResponse && (
-                    <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-xs text-slate-200 shadow-md">
+                    <div className="bg-card border border-border rounded-xl p-3.5 text-xs text-foreground shadow-md">
                       <div className="flex items-center justify-between mb-2">
                         {aiGrounded === null ? (
-                          <span className="text-[10px] font-mono font-bold text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">
+                          <span className="text-[10px] font-mono font-bold text-muted-foreground bg-card px-2 py-0.5 rounded border border-border">
                             {language === 'hi' ? 'उत्तर' : 'ANSWER'}
                           </span>
                         ) : aiGrounded ? (
-                          <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/50">
+                          <span className="text-[10px] font-mono font-bold text-success bg-success-muted px-2 py-0.5 rounded border border-success/40">
                             {language === 'hi' ? 'आपकी कंपनी की SOP पर आधारित' : "FROM YOUR COMPANY'S SOPs"}
                           </span>
                         ) : (
-                          <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/50">
+                          <span className="text-[10px] font-mono font-bold text-warning bg-warning-muted px-2 py-0.5 rounded border border-warning/40">
                             {language === 'hi' ? 'सामान्य जानकारी — कोई SOP नहीं मिली' : 'GENERAL GUIDANCE — NO SOP FOUND'}
                           </span>
                         )}
                         <button
                           type="button"
                           onClick={() => speakAudioNotification(aiResponse)}
-                          className="text-slate-400 hover:text-white transition"
+                          className="text-muted-foreground hover:text-foreground transition"
                           title="Replay Audio"
                         >
                           <Volume2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="leading-relaxed text-slate-200">{aiResponse}</p>
+                      <p className="leading-relaxed text-foreground">{aiResponse}</p>
                     </div>
                   )}
                 </div>
 
                 {voiceError && (
-                  <div role="alert" className="mt-3 text-xs text-amber-300 bg-amber-950/40 border border-amber-800/50 rounded-lg px-3 py-2">
+                  <div role="alert" className="mt-3 text-xs text-warning bg-warning-muted border border-warning/40 rounded-lg px-3 py-2">
                     {voiceError}
                   </div>
                 )}
 
                 {/* Suggested Technician Prompts */}
                 <div className="mt-3">
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
+                  <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">
                     Suggested Technician Voice Queries:
                   </span>
                   <div className="grid grid-cols-1 gap-1.5">
                     <button
                       type="button"
                       onClick={() => askTyped(language === 'hi' ? currentPart.questions.hi : currentPart.questions.en)}
-                      className="text-xs bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg px-3 py-2 text-left transition flex items-center justify-between group"
+                      className="text-xs bg-muted hover:bg-muted text-foreground border border-border rounded-lg px-3 py-2 text-left transition flex items-center justify-between group"
                     >
                       <span className="truncate">
                         💬 {language === 'hi' ? currentPart.questions.hi : currentPart.questions.en}
                       </span>
-                      <Send className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 ml-2" />
+                      <Send className="w-3 h-3 text-muted-foreground group-hover:text-primary shrink-0 ml-2" />
                     </button>
                     <button
                       type="button"
@@ -1095,12 +1095,12 @@ export default function SimulationStudioPage() {
                             : `What is the exact zero-energy LOTO isolation procedure for ${currentPart.name}?`
                         )
                       }
-                      className="text-xs bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg px-3 py-2 text-left transition flex items-center justify-between group"
+                      className="text-xs bg-muted hover:bg-muted text-foreground border border-border rounded-lg px-3 py-2 text-left transition flex items-center justify-between group"
                     >
                       <span className="truncate">
                         🔒 {language === 'hi' ? 'शून्य-ऊर्जा LOTO प्रक्रिया क्या है?' : 'Zero-energy LOTO isolation sequence?'}
                       </span>
-                      <Send className="w-3 h-3 text-slate-500 group-hover:text-blue-400 shrink-0 ml-2" />
+                      <Send className="w-3 h-3 text-muted-foreground group-hover:text-primary shrink-0 ml-2" />
                     </button>
                   </div>
                 </div>
@@ -1118,7 +1118,7 @@ export default function SimulationStudioPage() {
                       }
                     }}
                     placeholder={language === 'hi' ? 'सवाल टाइप करें या माइक दबाएं...' : 'Type question or hold PTT...'}
-                    className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="flex-1 bg-muted border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary/40"
                   />
                   <button
                     type="button"
@@ -1128,14 +1128,14 @@ export default function SimulationStudioPage() {
                         setManualInput('');
                       }
                     }}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold"
+                    className="bg-muted hover:bg-muted-foreground/20 text-foreground px-3 py-1.5 rounded-lg text-xs font-semibold"
                   >
                     Ask
                   </button>
                 </div>
 
                 {/* Ergonomic Push-To-Talk Button */}
-                <div className="mt-3 pt-3 border-t border-slate-800 flex flex-col items-center">
+                <div className="mt-3 pt-3 border-t border-border flex flex-col items-center">
                   <button
                     type="button"
                     onMouseDown={handleHoldStart}
@@ -1144,8 +1144,8 @@ export default function SimulationStudioPage() {
                     onTouchEnd={handleHoldEnd}
                     className={`w-full py-3.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2.5 transition shadow-lg select-none ${
                       isRecording
-                        ? 'bg-rose-600 text-white animate-pulse shadow-rose-600/40 ring-4 ring-rose-500/30'
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-600/25 active:scale-[0.99]'
+                        ? 'bg-danger-muted text-foreground animate-pulse shadow-rose-600/40 ring-4 ring-rose-500/30'
+                        : 'bg-gradient-to-r from-primary to-indigo-600 hover:from-primary hover:to-indigo-500 text-foreground shadow-primary/25 active:scale-[0.99]'
                     }`}
                   >
                     <Mic className="w-4 h-4" />
@@ -1153,7 +1153,7 @@ export default function SimulationStudioPage() {
                       {isRecording ? 'RELEASE TO SEND' : 'HOLD TO TALK [SPACEBAR]'}
                     </span>
                   </button>
-                  <span className="text-[10px] text-slate-500 mt-1">
+                  <span className="text-[10px] text-muted-foreground mt-1">
                     Hands-free shop-floor ergonomic mode · Bedrock Haiku SigV4 Stream
                   </span>
                 </div>
@@ -1167,42 +1167,42 @@ export default function SimulationStudioPage() {
 
         {/* TAB 3: INTERACTIVE SOP & GUIDED WORK ORDER */}
         {activeTab === 'sop' && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800">
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-xl max-w-4xl mx-auto">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 mb-6 border-b border-border">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold text-blue-400 bg-blue-950/60 px-2.5 py-0.5 rounded border border-blue-800/60">
+                  <span className="text-xs font-mono font-bold text-primary bg-accent px-2.5 py-0.5 rounded border border-primary/40">
                     WORK ORDER: WO-HYD-2026-8841
                   </span>
-                  <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/60">
+                  <span className="text-xs font-mono text-success bg-success-muted px-2 py-0.5 rounded border border-success/40">
                     PRIORITY: HIGH
                   </span>
                 </div>
-                <h2 className="text-lg font-bold text-white mt-1">
+                <h2 className="text-lg font-bold text-foreground mt-1">
                   Rexroth A10VSO Relief Valve Recalibration & Seal Integrity Verification
                 </h2>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   Standard Operating Procedure: {currentPart.sop.id} · Facility: Tata Motors Pune Bay 4B
                 </p>
               </div>
 
               <div className="text-right">
-                <span className="text-xs text-slate-400 block">Assigned Specialist:</span>
-                <span className="text-sm font-bold text-slate-200">Vikram Sharma (L2)</span>
+                <span className="text-xs text-muted-foreground block">Assigned Specialist:</span>
+                <span className="text-sm font-bold text-foreground">Vikram Sharma (L2)</span>
               </div>
             </div>
 
             {/* Pre-flight Tools */}
-            <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 mb-6">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-                <Wrench className="w-4 h-4 text-cyan-400" />
+            <div className="bg-muted border border-border rounded-xl p-4 mb-6">
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                <Wrench className="w-4 h-4 text-primary" />
                 Required Calibrated Tools & Safety Equipment:
               </span>
               <div className="flex flex-wrap gap-2">
                 {currentPart.sop.tools.map((t, idx) => (
                   <span
                     key={idx}
-                    className="text-xs bg-slate-900 border border-slate-700/80 px-3 py-1 rounded-lg text-slate-300 font-medium"
+                    className="text-xs bg-card border border-border px-3 py-1 rounded-lg text-foreground font-medium"
                   >
                     ✓ {t}
                   </span>
@@ -1212,8 +1212,8 @@ export default function SimulationStudioPage() {
 
             {/* Interactive Step-by-Step Checklist */}
             <div className="space-y-3 mb-6">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
-                <CheckSquare className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                <CheckSquare className="w-4 h-4 text-success" />
                 Sequential Maintenance Tasks:
               </span>
 
@@ -1226,15 +1226,15 @@ export default function SimulationStudioPage() {
                     onClick={() => setChecklist((prev) => ({ ...prev, [key]: !isChecked }))}
                     className={`p-3.5 rounded-xl border flex items-start gap-3 cursor-pointer transition select-none ${
                       isChecked
-                        ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-200'
-                        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-900'
+                        ? 'bg-success-muted border-success/40 text-success'
+                        : 'bg-muted border-border text-foreground hover:bg-card'
                     }`}
                   >
                     <div
                       className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition ${
                         isChecked
-                          ? 'bg-emerald-600 border-emerald-400 text-white'
-                          : 'border-slate-600 bg-slate-900'
+                          ? 'bg-success-muted border-success/40 text-foreground'
+                          : 'border-border bg-card'
                       }`}
                     >
                       {isChecked && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -1249,11 +1249,11 @@ export default function SimulationStudioPage() {
             </div>
 
             {/* Digital Sign-off Banner */}
-            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="bg-muted border border-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-bold text-white block">Technician Verification Sign-off</span>
-                <span className="text-xs text-slate-400">
-                  Updates your Skill Profile in DynamoDB (<code className="text-cyan-400">SKILLPROFILE#CURRENT</code>)
+                <span className="text-xs font-bold text-foreground block">Technician Verification Sign-off</span>
+                <span className="text-xs text-muted-foreground">
+                  Updates your Skill Profile in DynamoDB (<code className="text-primary">SKILLPROFILE#CURRENT</code>)
                 </span>
               </div>
 
@@ -1263,8 +1263,8 @@ export default function SimulationStudioPage() {
                 disabled={workOrderSigned}
                 className={`px-5 py-2.5 rounded-xl font-bold text-xs transition shadow-md ${
                   workOrderSigned
-                    ? 'bg-emerald-600 text-white cursor-default'
-                    : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/30'
+                    ? 'bg-success-muted text-foreground cursor-default'
+                    : 'bg-primary hover:bg-primary text-foreground shadow-primary/25'
                 }`}
               >
                 {workOrderSigned ? '✓ Work Order Completed & Logged' : 'Sign & Submit Work Order'}
@@ -1278,77 +1278,77 @@ export default function SimulationStudioPage() {
           <div className="space-y-6 max-w-5xl mx-auto">
             {/* Top Stat Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
-                <span className="text-[11px] font-mono text-slate-400 uppercase">Fleet Skill Gap Index</span>
-                <div className="text-2xl font-extrabold text-white mt-1">12%</div>
-                <div className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-lg">
+                <span className="text-[11px] font-mono text-muted-foreground uppercase">Fleet Skill Gap Index</span>
+                <div className="text-2xl font-extrabold text-foreground mt-1">12%</div>
+                <div className="text-xs text-success mt-1 flex items-center gap-1">
                   <span>↓ 16% reduction</span>
-                  <span className="text-slate-500">since Voice Twin rollout</span>
+                  <span className="text-muted-foreground">since Voice Twin rollout</span>
                 </div>
               </div>
 
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
-                <span className="text-[11px] font-mono text-slate-400 uppercase">Certified Technicians</span>
-                <div className="text-2xl font-extrabold text-white mt-1">18 / 22</div>
-                <div className="text-xs text-blue-400 mt-1">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-lg">
+                <span className="text-[11px] font-mono text-muted-foreground uppercase">Certified Technicians</span>
+                <div className="text-2xl font-extrabold text-foreground mt-1">18 / 22</div>
+                <div className="text-xs text-primary mt-1">
                   <span>82% Department Readiness</span>
                 </div>
               </div>
 
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-lg">
-                <span className="text-[11px] font-mono text-slate-400 uppercase">Avg Diagnostic Time (MTTR)</span>
-                <div className="text-2xl font-extrabold text-white mt-1">14.2 min</div>
-                <div className="text-xs text-emerald-400 mt-1">
+              <div className="bg-card border border-border rounded-2xl p-4 shadow-lg">
+                <span className="text-[11px] font-mono text-muted-foreground uppercase">Avg Diagnostic Time (MTTR)</span>
+                <div className="text-2xl font-extrabold text-foreground mt-1">14.2 min</div>
+                <div className="text-xs text-success mt-1">
                   <span>↓ 62% faster diagnosis</span>
                 </div>
               </div>
             </div>
 
             {/* Department Skill Gap Breakdown */}
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-blue-400" />
+            <div className="bg-card border border-border rounded-2xl p-6 shadow-xl">
+              <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-primary" />
                 Materialized Department Competency Rollup (AGG#DEPT#hydraulics#2026-09)
               </h3>
 
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">High-Pressure Calibration & Cracking Test (SOP-042)</span>
-                    <span className="font-mono font-bold text-emerald-400">92% Mastery</span>
+                    <span className="text-foreground">High-Pressure Calibration & Cracking Test (SOP-042)</span>
+                    <span className="font-mono font-bold text-success">92% Mastery</span>
                   </div>
-                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '92%' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">Proportional Solenoid Dither Tuning (SOP-089)</span>
-                    <span className="font-mono font-bold text-blue-400">76% Mastery</span>
-                  </div>
-                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-500 rounded-full" style={{ width: '76%' }} />
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-success-muted rounded-full" style={{ width: '92%' }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">Swashplate Slipper Bearing Clearance (SOP-029)</span>
-                    <span className="font-mono font-bold text-amber-400">64% Mastery</span>
+                    <span className="text-foreground">Proportional Solenoid Dither Tuning (SOP-089)</span>
+                    <span className="font-mono font-bold text-primary">76% Mastery</span>
                   </div>
-                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: '64%' }} />
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-primary rounded-full" style={{ width: '76%' }} />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-300">Zero-Energy LOTO Padlock Procedure (OSHA 1910.147)</span>
-                    <span className="font-mono font-bold text-emerald-400">100% Compliance</span>
+                    <span className="text-foreground">Swashplate Slipper Bearing Clearance (SOP-029)</span>
+                    <span className="font-mono font-bold text-warning">64% Mastery</span>
                   </div>
-                  <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full" style={{ width: '100%' }} />
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-warning-muted rounded-full" style={{ width: '64%' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-foreground">Zero-Energy LOTO Padlock Procedure (OSHA 1910.147)</span>
+                    <span className="font-mono font-bold text-success">100% Compliance</span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-full bg-success-muted rounded-full" style={{ width: '100%' }} />
                   </div>
                 </div>
               </div>
@@ -1360,7 +1360,7 @@ export default function SimulationStudioPage() {
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="border-t border-slate-800/80 bg-[#0a0f1a] py-3.5 px-6 text-center text-xs text-slate-500 flex flex-wrap items-center justify-between max-w-7xl mx-auto w-full">
+      <footer className="border-t border-border bg-background py-3.5 px-6 text-center text-xs text-muted-foreground flex flex-wrap items-center justify-between max-w-7xl mx-auto w-full">
         <span>SkillBridge Enterprise SKAD-AI · Multi-Tenant Industrial Skilling Platform</span>
         <span>Machine Twin Photogrammetry Engine · Sarvam Voice Engine</span>
       </footer>

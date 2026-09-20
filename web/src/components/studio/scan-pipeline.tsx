@@ -322,18 +322,18 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       {/* Engine status — from the engine's own capability report */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-xl flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span
               className={`w-2.5 h-2.5 rounded-full ${
-                engineReady ? 'bg-emerald-400' : caps ? 'bg-amber-400' : capsError ? 'bg-rose-500' : 'bg-slate-500 animate-pulse'
+                engineReady ? 'bg-success-muted' : caps ? 'bg-warning-muted' : capsError ? 'bg-danger-muted' : 'bg-muted-foreground/20 animate-pulse'
               }`}
             />
-            <h2 className="text-base font-bold text-white tracking-tight">Machine Twin Photogrammetry Engine</h2>
+            <h2 className="text-base font-bold text-foreground tracking-tight">Machine Twin Photogrammetry Engine</h2>
             <span
               data-testid="engine-status"
-              className="text-[10px] font-mono bg-slate-950 text-slate-300 border border-slate-800 px-2 py-0.5 rounded"
+              className="text-[10px] font-mono bg-muted text-foreground border border-border px-2 py-0.5 rounded"
             >
               {capsError
                 ? 'Unreachable'
@@ -344,12 +344,12 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                     : 'Not ready on this host'}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Photos → camera poses + coverage check → mesh → browser-ready GLB with levels of detail.
           </p>
-          {capsError && <p className="text-[11px] text-rose-300 mt-1">{capsError.message} {capsError.remediation}</p>}
+          {capsError && <p className="text-[11px] text-danger mt-1">{capsError.message} {capsError.remediation}</p>}
           {caps && !engineReady && (
-            <ul className="text-[11px] text-amber-300 mt-1 space-y-0.5">
+            <ul className="text-[11px] text-warning mt-1 space-y-0.5">
               {!caps.mesh_provider && <li>No mesh backend available on this host.</li>}
               {missingTools.map((k) => (
                 <li key={k}>
@@ -364,7 +364,7 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
           type="button"
           onClick={loadBuilt}
           disabled={!built}
-          className="bg-blue-600 enabled:hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2"
+          className="bg-primary enabled:hover:bg-primary disabled:bg-muted disabled:text-muted-foreground text-primary-foreground font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2"
         >
           <Layers className="w-4 h-4" />
           <span>Load scanned model in 3D viewer</span>
@@ -373,33 +373,33 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Setup & pipeline */}
-        <div className="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-card border border-border rounded-2xl p-6 shadow-xl flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <Camera className="w-4 h-4 text-cyan-400" />
+            <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+              <Camera className="w-4 h-4 text-primary" />
               New equipment scan
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
               <label className="block">
-                <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">Equipment name</span>
+                <span className="text-[11px] font-mono text-muted-foreground uppercase block mb-1">Equipment name</span>
                 <input
                   type="text"
                   value={name}
                   disabled={running}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Hydraulic power unit, bay 4"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium"
+                  className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/40 font-medium"
                 />
               </label>
               <label className="block">
-                <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">Manufacturer (optional)</span>
+                <span className="text-[11px] font-mono text-muted-foreground uppercase block mb-1">Manufacturer (optional)</span>
                 <input
                   type="text"
                   value={manufacturer}
                   disabled={running}
                   onChange={(e) => setManufacturer(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 font-medium"
+                  className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/40 font-medium"
                 />
               </label>
             </div>
@@ -408,15 +408,15 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
               type="button"
               disabled={running}
               onClick={() => fileInput.current?.click()}
-              className="w-full border-2 border-dashed border-slate-800 enabled:hover:border-blue-600 rounded-xl p-5 text-center bg-slate-950/40 mb-4 transition"
+              className="w-full border-2 border-dashed border-border enabled:hover:border-primary/40 rounded-xl p-5 text-center bg-muted mb-4 transition"
             >
-              <Upload className="w-8 h-8 text-blue-400 mx-auto mb-2 opacity-80" />
-              <div className="text-xs font-bold text-slate-200">
+              <Upload className="w-8 h-8 text-primary mx-auto mb-2 opacity-80" />
+              <div className="text-xs font-bold text-foreground">
                 {files.length
                   ? `${files.length} file(s) selected · ${fmtBytes(files.reduce((n, f) => n + f.size, 0))}`
                   : 'Choose a CAD assembly, walk-around photos, or a video'}
               </div>
-              <p className="text-[11px] text-slate-500 mt-1 max-w-md mx-auto">
+              <p className="text-[11px] text-muted-foreground mt-1 max-w-md mx-auto">
                 Upload a CAD assembly ({CAD_EXTENSIONS.join(' ')}) for a twin with separate,
                 nameable parts &mdash; or about 36 overlapping photographs, one roughly every 10
                 degrees, to reconstruct the machine as it stands. Coverage is checked, and a
@@ -433,7 +433,7 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
             />
 
             <div className="space-y-2 mb-4">
-              <span className="text-[11px] font-mono text-slate-400 uppercase block">Pipeline</span>
+              <span className="text-[11px] font-mono text-muted-foreground uppercase block">Pipeline</span>
               {STEPS.map((stg, idx) => {
                 const st = steps[stg.key];
                 const elapsed = st.state === 'running' && st.startedAt ? now - st.startedAt : st.durationMs;
@@ -444,24 +444,24 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                     data-state={st.state}
                     className={`p-2.5 rounded-lg border text-xs transition ${
                       st.state === 'done' || st.state === 'skipped'
-                        ? 'bg-emerald-950/20 border-emerald-800/40 text-emerald-200'
+                        ? 'bg-success-muted border-success/40 text-success'
                         : st.state === 'running'
-                          ? 'bg-blue-950/40 border-blue-600 text-blue-200'
+                          ? 'bg-accent border-primary/40 text-primary'
                           : st.state === 'failed'
-                            ? 'bg-rose-950/30 border-rose-800/60 text-rose-200'
-                            : 'bg-slate-950/40 border-slate-800 text-slate-500'
+                            ? 'bg-danger-muted border-danger/40 text-danger'
+                            : 'bg-muted border-border text-muted-foreground'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         {st.state === 'done' || st.state === 'skipped' ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <Check className="w-4 h-4 text-success" />
                         ) : st.state === 'running' ? (
-                          <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
+                          <Loader2 className="w-4 h-4 text-primary animate-spin" />
                         ) : st.state === 'failed' ? (
-                          <AlertTriangle className="w-4 h-4 text-rose-400" />
+                          <AlertTriangle className="w-4 h-4 text-danger" />
                         ) : (
-                          <span className="w-4 h-4 rounded-full border border-slate-700 flex items-center justify-center text-[9px] font-mono">
+                          <span className="w-4 h-4 rounded-full border border-border flex items-center justify-center text-[9px] font-mono">
                             {idx + 1}
                           </span>
                         )}
@@ -481,9 +481,9 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                       </span>
                     </div>
                     {st.error && (
-                      <div className="mt-2 text-[11px] text-rose-200">
+                      <div className="mt-2 text-[11px] text-danger">
                         <span className="font-mono font-bold">{st.error.code}</span> — {st.error.message}
-                        {st.error.remediation && <div className="text-rose-300/80 mt-0.5">{st.error.remediation}</div>}
+                        {st.error.remediation && <div className="text-danger mt-0.5">{st.error.remediation}</div>}
                       </div>
                     )}
                   </div>
@@ -492,10 +492,10 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-800">
+          <div className="pt-3 border-t border-border">
             {(running || doneCount > 0 || failed) && (
               <div className="mb-3">
-                <div className="flex justify-between text-[11px] font-mono text-slate-400 mb-1">
+                <div className="flex justify-between text-[11px] font-mono text-muted-foreground mb-1">
                   <span data-testid="scan-summary">
                     {failed
                       ? `Stopped at: ${failed.title}`
@@ -509,9 +509,9 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                     {doneCount}/{STEPS.length}
                   </span>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
                   <div
-                    className={`${failed ? 'bg-rose-500' : 'bg-blue-500'} h-full transition-all duration-300`}
+                    className={`${failed ? 'bg-danger-muted' : 'bg-primary'} h-full transition-all duration-300`}
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -524,7 +524,7 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                 disabled={running || !files.length || !name.trim()}
                 onClick={runScan}
                 data-testid="run-scan"
-                className="flex-1 py-3 rounded-xl font-bold text-xs transition shadow-lg flex items-center justify-center gap-2 bg-blue-600 enabled:hover:bg-blue-500 text-white disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed"
+                className="flex-1 py-3 rounded-xl font-bold text-xs transition shadow-lg flex items-center justify-center gap-2 bg-primary enabled:hover:bg-primary text-primary-foreground disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
               >
                 {running ? (
                   <>
@@ -542,7 +542,7 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
                 type="button"
                 onClick={loadBuilt}
                 disabled={!built}
-                className="bg-emerald-600 enabled:hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition shadow-lg flex items-center gap-2"
+                className="bg-success-muted enabled:hover:bg-success-muted disabled:bg-muted disabled:text-muted-foreground text-foreground font-bold text-xs px-5 py-3 rounded-xl transition shadow-lg flex items-center gap-2"
               >
                 <span>Load into 3D viewer</span>
                 <ArrowRight className="w-4 h-4" />
@@ -554,31 +554,31 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
         {/* Results — only what this run actually produced */}
         <div
           data-testid="scan-results"
-          className="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5"
+          className="lg:col-span-5 bg-card border border-border rounded-2xl p-6 shadow-xl flex flex-col gap-5"
         >
           {!projectId ? (
-            <div className="my-auto text-center text-xs text-slate-500 py-10">
-              <Layers className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+            <div className="my-auto text-center text-xs text-muted-foreground py-10">
+              <Layers className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               No scan run yet in this session. Results appear here as each step finishes.
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-border">
                 <div>
-                  <span className="text-[10px] font-mono uppercase text-slate-500 font-bold tracking-wider block">
+                  <span className="text-[10px] font-mono uppercase text-muted-foreground font-bold tracking-wider block">
                     Project {projectId}
                   </span>
-                  <h3 className="text-sm font-bold text-white mt-0.5">{builtName}</h3>
+                  <h3 className="text-sm font-bold text-foreground mt-0.5">{builtName}</h3>
                 </div>
                 {lods[0] && (
-                  <span className="text-[10px] bg-slate-950 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-md font-mono font-bold uppercase">
+                  <span className="text-[10px] bg-muted text-foreground border border-border px-2.5 py-1 rounded-md font-mono font-bold uppercase">
                     {lods[0].validation_status.replace(/_/g, ' ')}
                   </span>
                 )}
               </div>
 
               {warnings.length > 0 && (
-                <ul className="text-[11px] text-amber-300 space-y-0.5">
+                <ul className="text-[11px] text-warning space-y-0.5">
                   {warnings.map((w, i) => (
                     <li key={i}>{w}</li>
                   ))}
@@ -587,57 +587,57 @@ export function ScanPipelinePanel({ onLoadModel }: { onLoadModel: (asset: Machin
 
               {coverage && (
                 <div data-testid="coverage" className="text-xs">
-                  <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">Capture coverage</span>
-                  <div className="bg-slate-950/80 rounded-xl border border-slate-800 p-3 font-mono text-slate-200">
+                  <span className="text-[11px] font-mono text-muted-foreground uppercase block mb-1">Capture coverage</span>
+                  <div className="bg-muted rounded-xl border border-border p-3 font-mono text-foreground">
                     {Math.round(coverage.fraction * 100)}% registered ({coverage.registered}/{coverage.total} images) ·{' '}
                     {coverage.status}
-                    {imageCount !== null && <div className="text-slate-400 mt-1">{imageCount} image(s) used</div>}
-                    {meshProvider && <div className="text-slate-400">mesh backend: {meshProvider}</div>}
-                    {coverage.recommendation && <div className="text-amber-300 mt-1">{coverage.recommendation}</div>}
+                    {imageCount !== null && <div className="text-muted-foreground mt-1">{imageCount} image(s) used</div>}
+                    {meshProvider && <div className="text-muted-foreground">mesh backend: {meshProvider}</div>}
+                    {coverage.recommendation && <div className="text-warning mt-1">{coverage.recommendation}</div>}
                   </div>
                 </div>
               )}
 
               {lods.length > 0 && (
                 <div data-testid="lods">
-                  <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">Levels of detail</span>
-                  <div className="bg-slate-950/80 rounded-xl border border-slate-800 overflow-hidden text-xs font-mono">
-                    <div className="grid grid-cols-3 p-2.5 border-b border-slate-800/80 text-[10px] text-slate-400 font-bold">
+                  <span className="text-[11px] font-mono text-muted-foreground uppercase block mb-1">Levels of detail</span>
+                  <div className="bg-muted rounded-xl border border-border overflow-hidden text-xs font-mono">
+                    <div className="grid grid-cols-3 p-2.5 border-b border-border text-[10px] text-muted-foreground font-bold">
                       <span>LOD</span>
                       <span>VERTICES</span>
                       <span className="text-right">FILE SIZE</span>
                     </div>
                     {lods.map((l) => (
-                      <div key={l.id} className="grid grid-cols-3 p-2.5 border-b border-slate-900 last:border-0 text-slate-200">
+                      <div key={l.id} className="grid grid-cols-3 p-2.5 border-b border-border last:border-0 text-foreground">
                         <span>LOD-{l.lod}</span>
                         <span>{l.vertex_count.toLocaleString()}</span>
                         <span className="text-right">{fmtBytes(l.meta?.size_bytes)}</span>
                       </div>
                     ))}
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Geometry source: {lods[0]!.source}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Geometry source: {lods[0]!.source}</p>
                 </div>
               )}
 
               {lods.length > 0 && (
                 <div>
-                  <span className="text-[11px] font-mono text-slate-400 uppercase block mb-1">Components found</span>
+                  <span className="text-[11px] font-mono text-muted-foreground uppercase block mb-1">Components found</span>
                   {components.length ? (
                     <div className="space-y-1.5">
                       {components.map((c) => (
                         <div
                           key={c.id}
-                          className="bg-slate-950 p-2 rounded-lg border border-slate-800 flex items-center justify-between text-xs"
+                          className="bg-muted p-2 rounded-lg border border-border flex items-center justify-between text-xs"
                         >
-                          <span className="text-slate-200">{c.label}</span>
-                          <span className="text-[10px] font-mono text-slate-500">
+                          <span className="text-foreground">{c.label}</span>
+                          <span className="text-[10px] font-mono text-muted-foreground">
                             {c.stable_id} · {c.validation_status.replace(/_/g, ' ')}
                           </span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-500">None separated — parts are labelled in review.</p>
+                    <p className="text-xs text-muted-foreground">None separated — parts are labelled in review.</p>
                   )}
                 </div>
               )}

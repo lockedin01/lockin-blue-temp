@@ -330,14 +330,14 @@ export function TwinUploader() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-4 flex items-start justify-between gap-3">
           <div>
-            <h3 className="flex items-center gap-2 text-sm font-bold text-white">
-              <Box className="h-4 w-4 text-blue-400" />
+            <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
+              <Box className="h-4 w-4 text-primary" />
               Bring your own machine
             </h3>
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               Upload a CAD assembly for a part-separated twin, or a photo walk-around
               to reconstruct the machine as it actually stands.
             </p>
@@ -346,7 +346,7 @@ export function TwinUploader() {
             <button
               type="button"
               onClick={reset}
-              className="shrink-0 rounded-md border border-slate-700 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800"
+              className="shrink-0 rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-muted"
             >
               Start over
             </button>
@@ -370,44 +370,44 @@ export function TwinUploader() {
           type="button"
           disabled={busy}
           onClick={() => inputRef.current?.click()}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-slate-600 bg-slate-950/60 px-4 py-6 text-sm text-slate-300 transition hover:border-blue-500/60 hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted px-4 py-6 text-sm text-foreground transition hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-60"
         >
           {busy ? (
-            <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
           ) : (
-            <FileUp className="h-5 w-5 text-blue-400" />
+            <FileUp className="h-5 w-5 text-primary" />
           )}
           <span>
             {busy ? PHASE_LABEL[phase] : 'Choose files'}
-            {busy && detail ? <span className="text-slate-500"> &middot; {detail}</span> : null}
+            {busy && detail ? <span className="text-muted-foreground"> &middot; {detail}</span> : null}
           </span>
         </button>
 
-        <p className="mt-2 text-[11px] text-slate-500">
+        <p className="mt-2 text-[11px] text-muted-foreground">
           CAD: {CAD_EXTENSIONS.join(' ')} &middot; Capture: {MIN_PHOTOS}+ photographs, or a
           walk-around video
         </p>
 
         {phase === 'error' && error && (
-          <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-500/40 bg-amber-950/30 p-3">
-            <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+          <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning-muted p-3">
+            <TriangleAlert className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
             <div className="min-w-0">
               {error.code && (
-                <div className="font-mono text-[11px] uppercase tracking-wide text-amber-300">
+                <div className="font-mono text-[11px] uppercase tracking-wide text-warning">
                   {error.code}
                 </div>
               )}
-              <p className="text-xs text-amber-100">{error.message}</p>
+              <p className="text-xs text-warning">{error.message}</p>
               {error.remediation && (
-                <p className="mt-1.5 text-xs text-amber-200/80">{error.remediation}</p>
+                <p className="mt-1.5 text-xs text-warning">{error.remediation}</p>
               )}
             </div>
           </div>
         )}
 
         {phase === 'done' && (
-          <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-3 text-xs text-emerald-200">
-            <Check className="h-4 w-4 shrink-0 text-emerald-400" />
+          <div className="mt-4 flex items-center gap-2 rounded-xl border border-success/40 bg-success-muted p-3 text-xs text-success">
+            <Check className="h-4 w-4 shrink-0 text-success" />
             <span>
               {components.length} component{components.length === 1 ? '' : 's'} &middot;{' '}
               {localOnly
@@ -421,12 +421,12 @@ export function TwinUploader() {
       </div>
 
       {asset && (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <MachineViewer asset={asset} onPartSelected={() => undefined} />
 
           {components.length > 0 && (
             <div className="mt-4">
-              <h4 className="mb-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+              <h4 className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                 Components ({components.length})
               </h4>
               <div className="flex max-h-44 flex-wrap gap-1.5 overflow-y-auto">
@@ -437,8 +437,8 @@ export function TwinUploader() {
                     onClick={() => setSelected(component)}
                     className={`rounded-md border px-2 py-1 font-mono text-[10px] transition ${
                       selected?.stable_id === component.stable_id
-                        ? 'border-blue-400 bg-blue-950/60 text-blue-200'
-                        : 'border-slate-700 bg-slate-950/60 text-slate-300 hover:border-slate-500'
+                        ? 'border-primary/40 bg-accent text-primary'
+                        : 'border-border bg-muted text-foreground hover:border-border'
                     }`}
                   >
                     {component.stable_id.replace('SKB_COMPONENT_', '')}
@@ -447,13 +447,13 @@ export function TwinUploader() {
               </div>
 
               {selected && (
-                <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-xs">
-                  <dt className="text-slate-500">ID</dt>
-                  <dd className="font-mono text-slate-200">{selected.stable_id}</dd>
-                  <dt className="text-slate-500">Label</dt>
-                  <dd className="text-slate-200">{selected.label}</dd>
-                  <dt className="text-slate-500">Status</dt>
-                  <dd className="text-amber-300">{selected.validation_status}</dd>
+                <dl className="mt-3 grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 rounded-xl border border-border bg-muted p-3 text-xs">
+                  <dt className="text-muted-foreground">ID</dt>
+                  <dd className="font-mono text-foreground">{selected.stable_id}</dd>
+                  <dt className="text-muted-foreground">Label</dt>
+                  <dd className="text-foreground">{selected.label}</dd>
+                  <dt className="text-muted-foreground">Status</dt>
+                  <dd className="text-warning">{selected.validation_status}</dd>
                 </dl>
               )}
             </div>
