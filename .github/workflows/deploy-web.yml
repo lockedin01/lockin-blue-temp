@@ -1,0 +1,64 @@
+# Publish the web tier when master changes.
+#
+# The app deploys as a finished bundle rather than through an Amplify
+# repository connection, because Amplify's build side supports Next 15 and this
+# app is on 16.3.5 (see infra/scripts/deploy-web.mjs). This workflow keeps that
+# property — it builds here and uploads the result — while removing the part
+# that hurt: nothing published unless someone ran a script by hand, so the live
+# site sat on a stale build.
+#
+# Requires one repository secret: AWS_ROLE_ARN, a role this repo may assume via
+# GitHub's OIDC provider, holding the same permissions the manual deploy used.
+# Until that secret exists the workflow is skipped, and the manual path still
+# works: `node infra/scripts/deploy-web.mjs`.
+name: Deploy web
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'web/**'
+      - 'infra/scripts/deploy-web.mjs'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The lockfile needs legacy peer resolution: @google/model-viewer pins an
+      # older three than the app uses.
+      - name: Install
+        working-directory: web
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+
+      - name: Typecheck and lint
+        working-directory: web
+        run: |
+          npx tsc --noEmit
+          npx eslint src --max-warnings=999
+
+      - name: Configure AWS credentials
+        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ap-northeast-1
+
+      - name: Deploy
+        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        run: node infra/scripts/deploy-web.mjs
