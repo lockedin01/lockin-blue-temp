@@ -17,7 +17,14 @@ import type { MachineAsset } from '@/lib/types';
  */
 
 /** How long to wait for a model before showing the 2D path instead. */
-const MODEL_LOAD_DEADLINE_MS = 6000;
+/**
+ * How long to wait for a model before falling back to the 2D path.
+ *
+ * Generous because the fallback is not free: it costs the worker the ability to
+ * rotate the machine at all, so tripping early on a merely slow connection is
+ * worse than waiting. A CAD assembly runs to several megabytes.
+ */
+const MODEL_LOAD_DEADLINE_MS = 20000;
 
 export interface MachineViewerProps {
   asset: MachineAsset;
@@ -122,6 +129,14 @@ export function MachineViewer({
     );
   }
 
+  /*
+   * `loading="eager"`, not the default lazy: lazy defers the fetch until the
+   * element intersects the viewport, and inside a tab panel or below the fold
+   * that often never fires - so the model never starts loading, the deadline
+   * above trips, and the worker is handed the static poster with no way to
+   * rotate it. The library itself is still imported on demand, which is where
+   * the payload saving actually comes from.
+   */
   return (
     <model-viewer
       className="machine-viewer"
@@ -131,7 +146,8 @@ export function MachineViewer({
       camera-controls
       auto-rotate={autoRotate ? '' : undefined}
       shadow-intensity="1"
-      loading="lazy"
+      loading="eager"
+      reveal="auto"
       ref={viewerRef}
     >
       {asset.hotspots.map((hotspot, idx) => {
