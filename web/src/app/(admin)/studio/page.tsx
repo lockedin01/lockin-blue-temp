@@ -1441,33 +1441,49 @@ export default function SimulationStudioPage() {
               size to its own label and wrap to the next line fits every width.
             */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/twin?action=capabilities');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/twin?action=capabilities', 'GET');
-                }}
-                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold break-words text-cyan-400">GET /capabilities</div>
-                <div className="text-[10px] text-slate-400 mt-1">Photogrammetry (:8000)</div>
-              </button>
+              {/*
+                The two photogrammetry endpoints are shown only when the engine
+                is actually reachable.
 
-              <button
-                type="button"
-                onClick={() => {
-                  setApiEndpoint('/api/twin?action=projects');
-                  setApiMethod('GET');
-                  setApiPayload('{}');
-                  runApiCall('/api/twin?action=projects', 'GET');
-                }}
-                className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
-              >
-                <div className="font-bold break-words text-cyan-400">GET /projects</div>
-                <div className="text-[10px] text-slate-400 mt-1">Scan Projects (:8000)</div>
-              </button>
+                They proxy to a local FastAPI service on :8000 whose mesh stage
+                is macOS-only, so wherever this app is deployed they return
+                `502 Machine Twin engine is unavailable` every time. A button
+                whose only possible outcome is an error teaches the reader that
+                the backend is broken, which is the opposite of what a
+                verification console is for. `engineUp` is the same probe the
+                header status uses.
+              */}
+              {engineUp ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApiEndpoint('/api/twin?action=capabilities');
+                      setApiMethod('GET');
+                      setApiPayload('{}');
+                      runApiCall('/api/twin?action=capabilities', 'GET');
+                    }}
+                    className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                  >
+                    <div className="font-bold break-words text-cyan-400">GET /capabilities</div>
+                    <div className="text-[10px] text-slate-400 mt-1">Photogrammetry (:8000)</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setApiEndpoint('/api/twin?action=projects');
+                      setApiMethod('GET');
+                      setApiPayload('{}');
+                      runApiCall('/api/twin?action=projects', 'GET');
+                    }}
+                    className="min-w-0 flex-1 basis-40 p-3 bg-slate-950 hover:bg-slate-800 rounded-xl border border-slate-800 text-xs font-medium text-left transition"
+                  >
+                    <div className="font-bold break-words text-cyan-400">GET /projects</div>
+                    <div className="text-[10px] text-slate-400 mt-1">Scan Projects (:8000)</div>
+                  </button>
+                </>
+              ) : null}
 
               <button
                 type="button"
@@ -1516,11 +1532,21 @@ export default function SimulationStudioPage() {
                 onClick={() => {
                   setApiEndpoint('/api/assessments');
                   setApiMethod('POST');
+                  /**
+                   * The real schema is `{ assessmentId, response }` and nothing
+                   * else. This used to send `score: 95` and a `feedback` string
+                   * against `asmt_hydraulics_01`, which fails twice over: that
+                   * assessment does not exist, and the route deliberately has no
+                   * `score` field — attempts are graded by the async scorer,
+                   * because a client that could report its own score could
+                   * report a perfect one. Demonstrating the API with a body it
+                   * refuses, and which implies client-side scoring, is worse
+                   * than not demonstrating it.
+                   */
                   const p = JSON.stringify(
                     {
-                      assessmentId: 'asmt_hydraulics_01',
-                      score: 95,
-                      feedback: 'Correctly diagnosed relief valve pilot cavitation',
+                      assessmentId: 'diag-cylinder-drift',
+                      response: { questionId: 'drift-q1', selectedIndex: 0 },
                     },
                     null,
                     2
